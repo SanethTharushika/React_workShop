@@ -3,8 +3,12 @@ import mongoose from 'mongoose';
 import Student from "./models/student.js";
 import studentRouter from "./routers/studentRouter.js";
 import userRouter from "./routers/userRouter.js";
+import jwt from "jsonwebtoken";
+import authenticate from './middlewares/authenticate.js';
+
 //temporary
 import dns from "node:dns";
+import authentication from './middlewares/authenticate.js';
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 
@@ -19,6 +23,10 @@ mongoose.connect(mongoDBURI).then(
 )
 
 app.use(express.json());
+
+app.use(authentication);
+
+
 app.use("/students", studentRouter);
 app.use("/users", userRouter);
 

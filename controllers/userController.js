@@ -1,5 +1,6 @@
 import User from "../models/user.js"; 
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export async function createUser(req , res) {
     try {
@@ -49,9 +50,22 @@ export async function loginUser(req, res) {
         const isPasswordvalid = bcrypt.compareSync(password, user.password);
         if (isPasswordvalid) {
             // res.json({ message: "Login successful!" });
-            res.status(200).json({ message: "Login successful!" });
-            return;
+            // res.status(200).json({ message: "Login successful!" });
+                const token = jwt.sign({ 
+                    email: user.email,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    isAdmin: user.isAdmin,
+                    isBlocked: user.isBlocked,
+                    isEmailVerified: user.isEmailVerified,
+                    image: user.image
+                 }, 
+                 "secretkey2003!!!!"
+                );
 
+            res.json({ message: "Login successful!", token: token})
+           
+            
         } else {
             // res.json({ message: "Invalid password..." });
             res.status(401).json({ message: "Invalid password..." });

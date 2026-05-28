@@ -18,6 +18,17 @@ export async function getAllStudentNew(req , res) {
 }
 
 export function createStudent(req , res) {
+
+    if(req.user == null) {
+        res.status(401).json({ message: "Unauthorized access..." });
+        return;
+    }
+
+    if(req.user.isAdmin == false) {
+        res.status(403).json({ message: "Only administrators can create students..." });
+        return;
+    }
+
     const newStudent = new Student(req.body);
     newStudent.save().then(
         () => {
