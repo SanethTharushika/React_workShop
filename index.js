@@ -5,6 +5,7 @@ import studentRouter from "./routers/studentRouter.js";
 import userRouter from "./routers/userRouter.js";
 import jwt from "jsonwebtoken";
 import authenticate from './middlewares/authenticate.js';
+import productRouter from './routers/productRouter.js';
 
 //temporary
 import dns from "node:dns";
@@ -29,6 +30,7 @@ app.use(authentication);
 
 app.use("/students", studentRouter);
 app.use("/users", userRouter);
+app.use("/products", productRouter);
 
 app.get("/", (req, res)=>{
     Student.find().then(
