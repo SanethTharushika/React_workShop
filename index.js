@@ -6,6 +6,10 @@ import userRouter from "./routers/userRouter.js";
 import jwt from "jsonwebtoken";
 import authenticate from './middlewares/authenticate.js';
 import productRouter from './routers/productRouter.js';
+import dotenv from "dotenv";
+
+dotenv.config();
+
 
 //temporary
 import dns from "node:dns";
@@ -15,7 +19,7 @@ dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 const app = express();
 
-const mongoDBURI = "mongodb+srv://admin:12345@cluster0.9tog6bq.mongodb.net/dev?appName=Cluster0"
+const mongoDBURI = process.env.MONGO_URI;
 
 mongoose.connect(mongoDBURI).then(
     () => {

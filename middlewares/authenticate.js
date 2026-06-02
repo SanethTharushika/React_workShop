@@ -1,4 +1,8 @@
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config();
+
 
 export default function authentication(req, res, next) {
         const header = req.headers["authorization"];
@@ -11,7 +15,7 @@ export default function authentication(req, res, next) {
 
             // console.log(token);
 
-            jwt.verify(token, "secretkey2003!!!!", (err, decoded) => {
+            jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
 
                 if(decoded == null) {
 
