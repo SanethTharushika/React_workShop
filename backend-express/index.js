@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import authenticate from './middlewares/authenticate.js';
 import productRouter from './routers/productRouter.js';
 import dotenv from "dotenv";
+import cors from "cors";
 
 dotenv.config();
 
@@ -18,6 +19,8 @@ dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 
 const app = express();
+
+app.use(cors());
 
 const mongoDBURI = process.env.MONGO_URI;
 
