@@ -36,8 +36,8 @@ app.use(authentication);
 
 
 app.use("/students", studentRouter);
-app.use("/users", userRouter);
-app.use("/products", productRouter);
+app.use("/api/users", userRouter);
+app.use("/api/products", productRouter);
 
 app.get("/", (req, res)=>{
     Student.find().then(

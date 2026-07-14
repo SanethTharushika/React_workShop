@@ -62,13 +62,16 @@ export async function loginUser(req, res) {
                     isAdmin: user.isAdmin,
                     isBlocked: user.isBlocked,
                     isEmailVerified: user.isEmailVerified,
-                    image: user.image
+                    image: user.image,
                  }, 
-                 process.env.JWT_SECRET_KEY
+                 process.env.JWT_SECRET_KEY,
+                 {
+                    expiresIn : "24h"
+
+                 }
                 );
 
-            res.json({ message: "Login successful!", token: token})
-           
+            res.json({ message: "Login successful!", token: token , isAdmin: user.isAdmin })
             
         } else {
             // res.json({ message: "Invalid password..." });

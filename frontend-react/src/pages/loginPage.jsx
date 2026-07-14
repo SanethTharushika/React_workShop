@@ -5,29 +5,47 @@ import { FaGoogle } from "react-icons/fa";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
+import api from "../utils/api.js";
+import { useNavigate } from "react-router-dom";
+
 
 
 export default function LoginPage() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
 
     async function handleLogin() {
-        toast.success("Email: " + email + " Password: " + password);
+
+        setLoading(true);
+       
 
         try {
+            const response = await api.post("/users/login", {
+                email: email,
+                password: password
+            });
 
-            const response =await axios.post("http://localhost:3000/users/login",
-                {
-                    email: email,
-                    password: password
-                }
-            )
+            localStorage.setItem("token", response.data.token);
+
+            if(response.data.isAdmin) {
+                // window.location.href = "/admin";
+
+                navigate("/admin");
+
+            }else {
+                // window.location.href = "/";
+                navigate("/");
+            }
            
         } catch (error) {
-            toast.error("Invalid email or password");
+            toast.error( error?.response?.data?.message || "Login failed" );
            
         }
+
+        setLoading(false);
     }
 
     return (
@@ -71,7 +89,11 @@ export default function LoginPage() {
 
                 <p className="w-full h-2 text-white text-lg my-2">Forget your Password? click <Link to="/forget-password" className="font-bold">here</Link></p>
 
-                <button className="w-full h-[40px] bg-[#18c3cd] text-white rounded-lg mt-5 border border-white" onClick={handleLogin}>Sign In</button>
+                <button disabled={loading} className="w-full h-[40px] bg-[#18c3cd] text-white rounded-lg mt-5 border border-white" onClick={handleLogin}>
+                    {
+                        loading ? "loading..." : "Sign In"
+                    }
+                </button>
 
                 <p className="w-full h-2 text-white text-lg ">Don't have an account? click <Link to="/signup" className="font-bold">here</Link></p>
 
