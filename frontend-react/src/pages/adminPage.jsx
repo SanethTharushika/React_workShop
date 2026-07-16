@@ -36,7 +36,7 @@ export default function AdminPage() {
 
             </div>
 
-            <div className="w-[calc(100%-400px)] min-h-screen p-4 flex">
+            <div className="w-[calc(100%-300px)] min-h-screen p-4 flex">
 
                 <Routes>
                     <Route index element={<h1>Orders page</h1>} />
