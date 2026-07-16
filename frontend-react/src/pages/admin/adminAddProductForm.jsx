@@ -33,7 +33,7 @@ export default function AdminAddProductForm() {
                 </div>
             </div>
 
-            <div className="w-full h-[300px] flex border p-4 items-start gap-6">
+            <div className="w-full flex  p-4 items-start gap-4 flex-wrap">
                 <div className="w-[25%] h-[70px] flex flex-col ">
                     <label className="text-black text-semibold">Product ID</label>
                     <input value={productId} onChange={(e) => setProductId(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="PD-001" />
@@ -41,28 +41,116 @@ export default function AdminAddProductForm() {
                 </div>
 
 
+                <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Product Name</label>
+                    <input value={name} onChange={(e) => setName(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="Enter Product Name" />
 
+                </div>
 
-                <div className="w-[65%] h-[70px] flex items-start">
-                    <div className="w-[50%] h-[70px] flex flex-col ">
-                        <label className="text-black text-semibold">Product Name</label>
-                        <input value={name} onChange={(e) => setName(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="Enter Product Name" />
-
-                    </div>
-
-                    <div className="w-[95%] h-[70px] flex items-start ml-6 flex-col">
-                    {/* <div className="w-[50%] h-[70px] flex flex-col border"> */}
-                        <label className="text-black text-semibold">Alternative Names <span className="text-gray-400 italic">(comma-separated)</span></label>
-                        <input value={altNames} onChange={(e) => setAltNames(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="VGA,CPU,Graphics Card" />
-
-                    {/* </div> */}
-
-                    </div>
-
+                <div className="w-[45%] h-[70px] flex items-start  flex-col">
+                    
+                    <label className="text-black text-semibold">Alternative Names <span className="text-gray-400 italic">(comma-separated)</span></label>
+                    <input value={altNames} onChange={(e) => setAltNames(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="VGA,CPU,Graphics Card" />
 
 
 
                 </div>
+
+                <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Price</label>
+                    <input value={price} onChange={(e) => setPrice(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="Enter Price" />
+
+                </div>
+
+                 <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Labelled Price </label>
+                    <input value={labelledPrice} onChange={(e) => setLabelledPrice(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="Enter Labelled Price" />
+
+                </div>
+
+                 <div className="w-full h-[100px] flex flex-col ">
+                    <label className="text-black text-semibold">Description</label>
+                    <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="Enter Description" />
+
+                </div>
+
+                <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Images</label>
+                    <input multiple={true} onChange={(e) => setImages(e.target.file)} type="file" className="w-full h-[40px] border rounded-lg px-2"  placeholder="Upload Images" />
+
+                </div>
+
+                 {/* <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Availability</label>
+                    <input type="checkbox" checked={isAvailable} onChange={(e) => setIsAvailable(e.target.checked)} className="w-full h-[40px] border rounded-lg px-2"  placeholder="Enter Availability" />
+
+                </div> */}
+
+                 <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Availability</label>
+                    <select value={isAvailable} onChange={(e) => setIsAvailable(e.target.value)} className="w-full h-[40px] border rounded-lg px-2"  placeholder="Enter Availability">
+                        <option value={true}>Available</option>
+                        <option value={false}>Not Available</option>
+                    </select>
+
+                </div>
+
+                <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Stock</label>
+                    <input value={stock} onChange={(e) => setStock(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="Enter Stock" />
+
+                </div>
+
+                
+
+                <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Category</label>
+                    <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full h-[40px] border rounded-lg px-2"  placeholder="Enter Category">
+                        <option value="motherboard">Motherboard</option>
+                        <option value="graphic-card">Graphic Card</option>
+                        <option value="ram">RAM</option>
+                        <option value="processor">Processor</option>
+                        <option value="storage">Storage</option>
+                    </select>
+
+                </div>
+
+                <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Brand</label>
+                    <select value={brand} onChange={(e) => setBrand(e.target.value)} className="w-full h-[40px] border rounded-lg px-2"  placeholder="Enter Brand">
+                        <option value="asus">Asus</option>
+                        <option value="gigabyte">Gigabyte</option>
+                        <option value="msi">MSI</option>
+                        <option value="amd">AMD</option>
+                        <option value="intel">Intel</option>
+                        <option value="kingston">Kingston</option>
+                        <option value="corsair">Corsair</option>
+                        <option value="samsung">Samsung</option>
+                        <option value="seagate">Seagate</option>
+                        <option value="apple">Apple</option>
+                        <option value="dell">Dell</option>
+                        <option value="hp">HP</option>
+                        <option value="lenovo">Lenovo</option>
+                        <option value="">No Brand</option>
+                    </select>
+                </div>
+
+                    <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Model</label>
+                    <input value={model} onChange={(e) => setModel(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="RTX 5090" />
+
+                </div>
+
+
+                
+
+
+
+
+
+
+
+                
             </div>
 
         </div>
