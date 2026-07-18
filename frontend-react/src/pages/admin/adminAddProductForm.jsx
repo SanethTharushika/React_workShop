@@ -1,5 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import uploadMedia from "../../utils/mediaUpload";
+import toast from "react-hot-toast";
+import api from "../../utils/api";
+import { useNavigate } from "react-router-dom";
+
+
 
 export default function AdminAddProductForm() {
 
@@ -16,6 +22,72 @@ export default function AdminAddProductForm() {
     const [stock, setStock] = useState(0);
     const [brand, setBrand] = useState("");
     const [model, setModel] = useState("");
+    const [isloading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
+
+    async function addProduct() {
+
+        setIsLoading(true);
+
+        const token = localStorage.getItem("token");
+
+        if(token == null) {
+
+            toast.error("You are not logged in");
+            navigate("/signin");
+            return;
+
+        }
+        
+
+        const imageUploadPromises =[]
+
+        for(let i=0; i<image.length; i++){
+            imageUploadPromises.push(uploadMedia(image[i]))
+
+    }
+
+    try {
+
+        const imageUrls = await Promise.all(imageUploadPromises);
+
+        const altNamesArray = altNames.split(",");
+
+        const requestBody = {
+            productId : productId,
+            name : name,
+            altNames : altNamesArray,
+            description : description,
+            price : price,
+            labelledPrice : labelledPrice,
+            image : imageUrls,
+            isAvailable : isAvailable,
+            category : category,
+            stock : stock,
+            brand : brand,
+            model : model
+        }
+
+        await api.post("/products", requestBody , 
+            {
+                headers : {
+                    Authorization : "Bearer " + token
+                }
+            }
+        )  
+        
+        toast.success("Product added successfully");
+        navigate("/admin/products");
+
+        setIsLoading(false);
+
+    }catch (error) {
+        
+        toast.error(error?.response?.data?.message || error?.message || "Failed to add product");
+        setIsLoading(false);
+    }
+     
+}
 
 
 
@@ -29,7 +101,7 @@ export default function AdminAddProductForm() {
                 <div className="h-full gap-4 flex items-center">
 
                     <Link to="/admin/products" className="w-[100px] bg-red-600 rounded-lg text-white px-4 py-2  text-center">Cancel</Link>
-                    <Link to="/admin/products" className="w-[100px] bg-green-600 rounded-lg text-white px-4 py-2  text-center">Save</Link>
+                    <button disabled={isloading} onClick={addProduct} className="w-[100px] bg-green-600 rounded-lg text-white px-4 py-2  text-center hover:bg-green-900">{isloading ? "Saving..." : "Save"}</button>
                 </div>
             </div>
 
@@ -76,7 +148,7 @@ export default function AdminAddProductForm() {
 
                 <div className="w-[25%] h-[70px] flex flex-col ">
                     <label className="text-black text-semibold">Images</label>
-                    <input multiple={true} onChange={(e) => setImages(e.target.file)} type="file" className="w-full h-[40px] border rounded-lg px-2"  placeholder="Upload Images" />
+                    <input multiple={true} onChange={(e) => setImage(e.target.files)} type="file" className="w-full h-[40px] border rounded-lg px-2"  placeholder="Upload Images" />
 
                 </div>
 
@@ -97,7 +169,7 @@ export default function AdminAddProductForm() {
 
                 <div className="w-[25%] h-[70px] flex flex-col ">
                     <label className="text-black text-semibold">Stock</label>
-                    <input value={stock} onChange={(e) => setStock(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="Enter Stock" />
+                    <input value={stock} onChange={(e) => setStock(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="0" />
 
                 </div>
 
@@ -142,14 +214,7 @@ export default function AdminAddProductForm() {
                 </div>
 
 
-                
-
-
-
-
-
-
-
+            
                 
             </div>
 

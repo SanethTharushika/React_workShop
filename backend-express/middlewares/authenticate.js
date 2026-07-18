@@ -10,24 +10,31 @@ export default function authentication(req, res, next) {
 
         if(header == null) {
             next();
-        }else {
-            const token = header.replace("Bearer ", "");
+            return;
+        }
 
-            // console.log(token);
+        const token = header.startsWith("Bearer ") ? header.slice(7).trim() : header.trim();
 
-            jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
+        if (token.length === 0) {
+            res.status(401).json({ message: "Invalid token..." });
+            return;
+        }
 
-                if(decoded == null) {
+        // console.log(token);
 
-                    res.status(401).json({ message: "Invalid token..." });
-                
-                }else{
+        jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
 
-                    req.user = decoded;
-                    next();
-                }
+            if (err || decoded == null) {
 
-            });
+                res.status(401).json({ message: err?.message || "Invalid token..." });
+                return;
+            }
+
+            req.user = decoded;
+            next();
+
+        });
+
         }
        
-    }
+    
