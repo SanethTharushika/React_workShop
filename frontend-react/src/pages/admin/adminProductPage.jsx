@@ -1,42 +1,105 @@
 import { IoIosAdd } from "react-icons/io";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { useEffect } from "react";
+import api from "../../utils/api";
 
 const sampleProducts = [
     {
         productId: "1",
         name: "Product 1",
-        price: 19.99
+        price: 19.99,
+        labelledPrice: 24.99,
+        brand: "Brand 1",
+        model: "Model 1",
+        category: "Category 1",
+        isAvailable: true,
+        stock: 10
     },
     {
         productId: "2",
         name: "Product 2",
-        price: 29.99
+        price: 29.99,
+        labelledPrice: 34.99,
+        brand: "Brand 2",
+        model: "Model 2",
+        category: "Category 2",
+        isAvailable: false,
+        stock: 0
     },
     {
         productId: "3",
         name: "Product 3",
-        price: 39.99
+        price: 39.99,
+        labelledPrice: 44.99,
+        brand: "Brand 3",
+        model: "Model 3",
+        category: "Category 3",
+        isAvailable: true,
+        stock: 5
     }
 ];
 
 export default function AdminProductPage() {
 
-    const [products] = useState(sampleProducts);
+    const [products, setProducts] = useState(sampleProducts);
+
+    useEffect(() => {
+        api.get("/products").then((response) => {
+            console.log(response.data);
+            setProducts(response.data);
+        });
+    }, []);
+    
 
     return (
         <div className="w-full h-full p-5">
 
-            {products.map((product) => (
-                <div
-                    key={product.productId}
-                    className="bg-white shadow-md rounded-lg p-4 mb-3"
-                >
-                    <p><strong>Product ID:</strong> {product.productId}</p>
-                    <p><strong>Name:</strong> {product.name}</p>
-                    <p><strong>Price:</strong> ${product.price}</p>
-                </div>
-            ))}
+
+            <table>
+                <thead>
+                    <tr>
+                        <td></td>
+                        <td>Product Id</td>
+                        <td>Name</td>
+                        <td>Price</td>
+                        <td>Labelled Price</td>
+                        <td>Brand</td>
+                        <td>Model</td>
+                        <td>Category</td>
+                        <td>Availability</td>
+                        <td>Stock</td>
+                        <td>Actions</td>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {
+                        products.map(
+                            (product) =>{
+                                return <tr>
+                                    <td>
+                                        <img src={product.image} alt={product.name} className="w-16 h-16 object-cover" />
+                                    </td>
+                                    <td>{product.productId}</td>
+                                    <td>{product.name}</td>
+                                    <td>${product.price}</td>
+                                    <td>{product.labelledPrice}</td>
+                                    <td>{product.brand}</td>
+                                    <td>{product.model}</td>
+                                    <td>{product.category}</td>
+                                    <td>{product.isAvailable ? "Available" : "Out of Stock"}</td>
+                                    <td>{product.stock}</td> 
+                                </tr>
+
+                                
+                            }
+                        )
+                            
+                    }
+                </tbody>
+
+            </table>
 
             <Link
                 to="/admin/add-product"
