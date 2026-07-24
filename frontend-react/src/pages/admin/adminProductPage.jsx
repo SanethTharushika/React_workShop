@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useEffect } from "react";
 import api from "../../utils/api";
+import toast from "react-hot-toast";
+import LoadingScreen from "../../components/loadingScreen";
 
 const sampleProducts = [
     {
@@ -43,17 +45,32 @@ const sampleProducts = [
 export default function AdminProductPage() {
 
     const [products, setProducts] = useState(sampleProducts);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        api.get("/products").then((response) => {
-            console.log(response.data);
-            setProducts(response.data);
-        });
-    }, []);
-    
+
+        if (loading) {
+
+            const token = localStorage.getItem("token");
+            api.get("/products", {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }).then((response) => {
+                console.log(response.data);
+                setProducts(response.data);
+                setLoading(false);
+            });
+
+        }
+    }, [loading]);
+
 
     return (
         <div className="w-full h-full p-5">
+            {
+                loading && <loadingScreen />
+            }
 
 
             <table>
@@ -76,7 +93,7 @@ export default function AdminProductPage() {
                 <tbody>
                     {
                         products.map(
-                            (product) =>{
+                            (product) => {
                                 return <tr>
                                     <td>
                                         <img src={product.image} alt={product.name} className="w-16 h-16 object-cover" />
@@ -89,13 +106,35 @@ export default function AdminProductPage() {
                                     <td>{product.model}</td>
                                     <td>{product.category}</td>
                                     <td>{product.isAvailable ? "Available" : "Out of Stock"}</td>
-                                    <td>{product.stock}</td> 
+                                    <td>{product.stock}</td>
+                                    <td>
+                                        <button className="w-[100px] bg-red-500 text-white p-2 rounded-full hover:bg-red-800"
+                                            onClick={
+                                                () => {
+                                                    toast.success(product.productId);
+                                                    const token = localStorage.getItem("token");
+
+                                                    api.delete("/products/" + product.productId, {
+                                                        headers: {
+                                                            Authorization: `Bearer ${token}`
+                                                        }
+                                                    }).then(() => {
+                                                        toast.success("Product deleted successfully");
+                                                        setLoading(true);
+                                                    })
+                                                        .catch(() => {
+                                                            toast.error("Failed to delete product");
+                                                        });
+                                                }
+                                            }
+                                        >Delete</button>
+                                    </td>
                                 </tr>
 
-                                
+
                             }
                         )
-                            
+
                     }
                 </tbody>
 
