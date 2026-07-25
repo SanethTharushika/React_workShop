@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useEffect } from "react";
 import api from "../../utils/api";
 import toast from "react-hot-toast";
-import LoadingScreen from "../../components/loadingScreen";
+import LoadingScreen from "../../components/loadingScreen.jsx";
+import ProductDeleteButton from "../../components/productDeleteButton.jsx";
 
 const sampleProducts = [
     {
@@ -69,7 +70,7 @@ export default function AdminProductPage() {
     return (
         <div className="w-full h-full p-5">
             {
-                loading && <loadingScreen />
+                loading && <LoadingScreen />
             }
 
 
@@ -108,7 +109,7 @@ export default function AdminProductPage() {
                                     <td>{product.isAvailable ? "Available" : "Out of Stock"}</td>
                                     <td>{product.stock}</td>
                                     <td>
-                                        <button className="w-[100px] bg-red-500 text-white p-2 rounded-full hover:bg-red-800"
+                                        {/* <button className="w-[100px] bg-red-500 text-white p-2 rounded-full hover:bg-red-800"
                                             onClick={
                                                 () => {
                                                     toast.success(product.productId);
@@ -127,7 +128,9 @@ export default function AdminProductPage() {
                                                         });
                                                 }
                                             }
-                                        >Delete</button>
+                                        >Delete</button> */}
+
+                                        <ProductDeleteButton />
                                     </td>
                                 </tr>
 
