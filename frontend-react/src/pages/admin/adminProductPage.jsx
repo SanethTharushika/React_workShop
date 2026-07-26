@@ -130,7 +130,7 @@ export default function AdminProductPage() {
                                             }
                                         >Delete</button> */}
 
-                                        <ProductDeleteButton />
+                                        <ProductDeleteButton productId={product.productId} refresh={() => setLoading(true)} />
                                     </td>
                                 </tr>
 
