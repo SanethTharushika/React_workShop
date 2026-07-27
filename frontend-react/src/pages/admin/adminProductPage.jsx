@@ -73,21 +73,31 @@ export default function AdminProductPage() {
                 loading && <LoadingScreen />
             }
 
+        
+            <div className="w-full h-[100px] bg-white shadow-2xl mb-10 rounded-lg flex p-4 items-center justify-between">
 
-            <table>
-                <thead>
+                <h1 className="text-2xl font-semibold">All Product</h1>
+
+                <div className="h-full gap-4 flex items-center">
+                    {products.length} Products
+
+                </div>
+            </div>
+
+            <table className="w-full text-center overflow-hidden rounded-lg">
+                <thead className="h-[40px] bg-accent text-white font-semibold ">
                     <tr>
-                        <td></td>
-                        <td>Product Id</td>
-                        <td>Name</td>
-                        <td>Price</td>
-                        <td>Labelled Price</td>
-                        <td>Brand</td>
-                        <td>Model</td>
-                        <td>Category</td>
-                        <td>Availability</td>
-                        <td>Stock</td>
-                        <td>Actions</td>
+                        <td className="w-[5%]"></td>
+                        <td className="w-[7%]">Product Id</td>
+                        <td className="w-[18%]">Name</td>
+                        <td className="w-[8%]">Price</td>
+                        <td className="w-[11%]">Labelled Price</td>
+                        <td className="w-[8%]">Brand</td>
+                        <td className="w-[8%]">Model</td>
+                        <td className="w-[8%]">Category</td>
+                        <td className="w-[10%]">Availability</td>
+                        <td className="w-[5%]">Stock</td>
+                        <td className="w-[12%]">Actions</td>
                     </tr>
                 </thead>
 
@@ -95,7 +105,7 @@ export default function AdminProductPage() {
                     {
                         products.map(
                             (product) => {
-                                return <tr>
+                                return <tr className="odd:bg-gray-300">
                                     <td>
                                         <img src={product.image} alt={product.name} className="w-16 h-16 object-cover" />
                                     </td>
@@ -130,7 +140,14 @@ export default function AdminProductPage() {
                                             }
                                         >Delete</button> */}
 
-                                        <ProductDeleteButton productId={product.productId} refresh={() => setLoading(true)} />
+                                        <div className="w-full flex justify-center items-center ">
+
+                                            <ProductDeleteButton productId={product.productId} refresh={() => setLoading(true)} />
+
+
+                                        </div>
+
+                                        
                                     </td>
                                 </tr>
 
