@@ -4,6 +4,7 @@ import { BsGift } from "react-icons/bs";
 import { FaRegUser } from "react-icons/fa";
 import AdminProductPage from "./admin/adminProductPage";
 import AdminAddProductForm from "./admin/adminAddProductForm";
+import AdminEditProductForm from "./admin/adminEditProductForm";
 
 
 export default function AdminPage() {
@@ -43,6 +44,7 @@ export default function AdminPage() {
                     <Route path="products" element={<AdminProductPage/>} />
                     <Route path="users" element={<h1>Users-page</h1>} />
                     <Route path="add-product" element={<AdminAddProductForm/>} />
+                    <Route path="edit-product" element={<AdminEditProductForm/>} />
                 </Routes>
 
             </div>

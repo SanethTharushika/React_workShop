@@ -6,6 +6,7 @@ import api from "../../utils/api";
 import toast from "react-hot-toast";
 import LoadingScreen from "../../components/loadingScreen.jsx";
 import ProductDeleteButton from "../../components/productDeleteButton.jsx";
+import { CiEdit } from "react-icons/ci";
 
 const sampleProducts = [
     {
@@ -140,7 +141,10 @@ export default function AdminProductPage() {
                                             }
                                         >Delete</button> */}
 
-                                        <div className="w-full flex justify-center items-center ">
+                                        <div className="w-full flex justify-center items-center gap-4 ">
+
+                                            <Link to="/admin/edit-product" state={product}><CiEdit className="text-blue-600 text-xl hover:text-3xl"></CiEdit></Link>
+                                            
 
                                             <ProductDeleteButton productId={product.productId} refresh={() => setLoading(true)} />
 

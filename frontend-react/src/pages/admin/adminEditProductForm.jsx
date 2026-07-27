@@ -1,0 +1,229 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import uploadMedia from "../../utils/mediaUpload";
+import toast from "react-hot-toast";
+import api from "../../utils/api";
+import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+
+
+
+export default function AdminEditProductForm() {
+
+    const location = useLocation();
+    const [productId, setProductId] = useState(location.state.productId);
+    const [name, setName] = useState(location.state.name);
+    const [altNames, setAltNames] = useState(location.state.altNames.join(','));
+    const [description, setDescription] = useState(location.state.description);
+    const [price, setPrice] = useState(location.state.price);
+    const [labelledPrice, setLabelledPrice] = useState(location.state.labelledPrice);
+    const [image, setImage] = useState([]);
+    const [isAvailable, setIsAvailable] = useState(location.state.isAvailable);
+    const [category, setCategory] = useState(location.state.category);
+    const [stock, setStock] = useState(location.state.stock);
+    const [brand, setBrand] = useState(location.state.brand);
+    const [model, setModel] = useState(location.state.model);
+    const [isloading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
+
+    async function editProduct() {
+
+        setIsLoading(true);
+
+        const token = localStorage.getItem("token");
+
+        if(token == null) {
+
+            toast.error("You are not logged in");
+            navigate("/signin");
+            return;
+
+        }
+        
+
+       
+
+    try {
+
+        const imageUploadPromises =[]
+
+        for(let i=0; i<image.length; i++){
+            imageUploadPromises.push(uploadMedia(image[i]))
+
+        }
+
+        let  imageUrls = await Promise.all(imageUploadPromises);
+
+        if(imageUrls.length == 0) {
+            imageUrls = location.state.image;
+        }
+
+        const altNamesArray = altNames.split(",");
+
+        const requestBody = {
+            name : name,
+            altNames : altNamesArray,
+            description : description,
+            price : price,
+            labelledPrice : labelledPrice,
+            image : imageUrls,
+            isAvailable : isAvailable,
+            category : category,
+            stock : stock,
+            brand : brand,
+            model : model
+        }
+
+        await api.put("/products/" + productId, requestBody , 
+            {
+                headers : {
+                    Authorization : "Bearer " + token
+                }
+            }
+        )  
+        
+        toast.success("Product updated successfully");
+        navigate("/admin/products");
+
+        setIsLoading(false);
+
+    }catch (error) {
+        
+        toast.error(error?.response?.data?.message || error?.message || "Failed to update product");
+        setIsLoading(false);
+    }
+     
+}
+
+
+
+    return (
+        <div className="w-[100%] h-full flex items-start flex-col ">
+
+            <div className="w-full h-[100px] bg-white shadow-2xl rounded-lg flex p-4 items-center justify-between">
+
+                <h1 className="text-2xl font-semibold">Edit Product</h1>
+
+                <div className="h-full gap-4 flex items-center">
+
+                    <Link to="/admin/products" className="w-[100px] bg-red-600 rounded-lg text-white px-4 py-2  text-center">Cancel</Link>
+                    <button disabled={isloading} onClick={editProduct} className="w-[100px] bg-green-600 rounded-lg text-white px-4 py-2  text-center hover:bg-green-900">{isloading ? "Saving..." : "Save"}</button>
+                </div>
+            </div>
+
+            <div className="w-full flex  p-4 items-start gap-4 flex-wrap">
+                <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Product ID</label>
+                    <input disabled value={productId} onChange={(e) => setProductId(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="PD-001" />
+
+                </div>
+
+
+                <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Product Name</label>
+                    <input value={name} onChange={(e) => setName(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="Enter Product Name" />
+
+                </div>
+
+                <div className="w-[45%] h-[70px] flex items-start  flex-col">
+                    
+                    <label className="text-black text-semibold">Alternative Names <span className="text-gray-400 italic">(comma-separated)</span></label>
+                    <input value={altNames} onChange={(e) => setAltNames(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="VGA,CPU,Graphics Card" />
+
+
+
+                </div>
+
+                <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Price</label>
+                    <input value={price} onChange={(e) => setPrice(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="Enter Price" />
+
+                </div>
+
+                 <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Labelled Price </label>
+                    <input value={labelledPrice} onChange={(e) => setLabelledPrice(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="Enter Labelled Price" />
+
+                </div>
+
+                 <div className="w-full h-[100px] flex flex-col ">
+                    <label className="text-black text-semibold">Description</label>
+                    <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="Enter Description" />
+
+                </div>
+
+                <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Images</label>
+                    <input multiple={true} onChange={(e) => setImage(e.target.files)} type="file" className="w-full h-[40px] border rounded-lg px-2"  placeholder="Upload Images" />
+
+                </div>
+
+                 {/* <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Availability</label>
+                    <input type="checkbox" checked={isAvailable} onChange={(e) => setIsAvailable(e.target.checked)} className="w-full h-[40px] border rounded-lg px-2"  placeholder="Enter Availability" />
+
+                </div> */}
+
+                 <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Availability</label>
+                    <select value={isAvailable} onChange={(e) => setIsAvailable(e.target.value)} className="w-full h-[40px] border rounded-lg px-2"  placeholder="Enter Availability">
+                        <option value={true}>Available</option>
+                        <option value={false}>Not Available</option>
+                    </select>
+
+                </div>
+
+                <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Stock</label>
+                    <input value={stock} onChange={(e) => setStock(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="0" />
+
+                </div>
+
+                
+
+                <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Category</label>
+                    <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full h-[40px] border rounded-lg px-2"  placeholder="Enter Category">
+                        <option value="motherboard">Motherboard</option>
+                        <option value="graphic-card">Graphic Card</option>
+                        <option value="ram">RAM</option>
+                        <option value="processor">Processor</option>
+                        <option value="storage">Storage</option>
+                    </select>
+
+                </div>
+
+                <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Brand</label>
+                    <select value={brand} onChange={(e) => setBrand(e.target.value)} className="w-full h-[40px] border rounded-lg px-2"  placeholder="Enter Brand">
+                        <option value="asus">Asus</option>
+                        <option value="gigabyte">Gigabyte</option>
+                        <option value="msi">MSI</option>
+                        <option value="amd">AMD</option>
+                        <option value="intel">Intel</option>
+                        <option value="kingston">Kingston</option>
+                        <option value="corsair">Corsair</option>
+                        <option value="samsung">Samsung</option>
+                        <option value="seagate">Seagate</option>
+                        <option value="apple">Apple</option>
+                        <option value="dell">Dell</option>
+                        <option value="hp">HP</option>
+                        <option value="lenovo">Lenovo</option>
+                        <option value="">No Brand</option>
+                    </select>
+                </div>
+
+                    <div className="w-[25%] h-[70px] flex flex-col ">
+                    <label className="text-black text-semibold">Model</label>
+                    <input value={model} onChange={(e) => setModel(e.target.value)} className="w-full h-[40px] border rounded-lg px-2" type="text" placeholder="RTX 5090" />
+
+                </div>
+
+
+            
+                
+            </div>
+
+        </div>
+    )
+}
