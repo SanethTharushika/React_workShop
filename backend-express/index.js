@@ -12,7 +12,7 @@ import cors from "cors";
 dotenv.config();
 
 
-//temporary
+
 import dns from "node:dns";
 import authentication from './middlewares/authenticate.js';
 dns.setServers(["1.1.1.1", "8.8.8.8"]);

@@ -97,7 +97,7 @@ export default function LoginPage() {
 
                 <p className="w-full h-2 text-white text-lg ">Don't have an account? click <Link to="/signup" className="font-bold">here</Link></p>
 
-                <button className="w-full h-[40px] bg-black text-white rounded-lg flex justify-center items-center gap-2 mt-8 border border-white" onClick={handleLogin}><FaGoogle />Sign In with Google</button>
+                <button className="w-full h-[40px] bg-[#18c3cd] text-white rounded-lg flex justify-center items-center gap-2 mt-8 border border-white" onClick={handleLogin}><FaGoogle />Sign In with Google</button>
 
 
             </div>
