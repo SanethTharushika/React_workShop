@@ -1,9 +1,15 @@
 import { Route } from "react-router-dom";
 import { Routes } from "react-router-dom";
+import Header from "../components/header.jsx";
 
 export default function HomePage() {
     return (
-        <div className="w-full min-h-screen">
+        <div className="w-full min-h-screen bg-primary text-secondary">
+
+            <Header/>
+
+            <div>
+
             <Routes>
                 <Route path="/" element={<h1>Home Page</h1>}/>
                 {/* products */}
@@ -16,6 +22,7 @@ export default function HomePage() {
                 <Route path="/*" element={<h1>404 Not Found</h1>}/>
                 
             </Routes>
+            </div>
         </div>
     )
 }
