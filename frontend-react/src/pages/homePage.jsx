@@ -8,7 +8,7 @@ export default function HomePage() {
 
             <Header/>
 
-            <div>
+            <div className="h-[calc(100vh-100px)] w-full">
 
             <Routes>
                 <Route path="/" element={<h1>Home Page</h1>}/>
