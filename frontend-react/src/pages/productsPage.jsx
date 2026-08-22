@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useEffect } from "react";
-import api from "../api/api.js";
+import api from "../utils/api.js";
 import LoadingScreen from "../components/loadingScreen.jsx"; 
+import ProductCard from "../components/productCard.jsx";
 
-export default function productsPage() {
+export default function ProductsPage() {
 
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -24,7 +25,7 @@ export default function productsPage() {
     }, [loading]);
 
     return (
-        <div className="w-full min-h-screen bg-primary text-secondary">
+        <div className="w-full bg-primary flex justify-center items-center gap-6 p-20 flex-wrap">
            {
                 loading && <LoadingScreen/>
            }
@@ -32,9 +33,10 @@ export default function productsPage() {
            {
                 !loading && <>
                     {
-                        products.map((product)   => {
+                        products.map((product)=> {
                             return (
-                                
+                                <ProductCard key={product._id} product={product}/>
+
                             )
                         }
                     )}
