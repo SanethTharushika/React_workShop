@@ -10,18 +10,19 @@ export default function ProductCard(props) {
         <div className="bg-white rounded-lg w-72 h-96 shadow-xl flex flex-col ">
             {/* <h1>{product.name}</h1> */}
 
-            <img src={product.image[0]} className="w-full h-[60%] object-cover rounded-tl-lg rounded-tr-lg"/>
-            <div className="w-full h-[40%] p-4 flex flex-col justify-between">
+            <img src={product.image[0]} className="w-full h-[70%] object-cover rounded-tl-lg rounded-tr-lg"/>
+            <div className="w-full h-[30%] p-4 flex flex-col justify-between">
 
                 <h1 className="text-lg font-semibold">{product.name}</h1>
-                <p className="text-accent">{price}</p>
-                {labelledPrice > 0 && labelledPrice !== price && (
-                    <p className="text-accent line-through decoration-2">{labelledPrice}</p>
-                )}
-
+               <p className="text-accent  decoration-2">{product.price}</p>
+                <p className="text-accent line-through decoration-2">{getFormattedPrice(labelledPrice)}</p>
 
             </div>
            
         </div>
     )
+}
+
+function getFormattedPrice(price) {
+    return Number.isFinite(price) ? price.toLocaleString() : "Price unavailable";
 }
