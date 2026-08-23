@@ -8,15 +8,20 @@ export default function ProductCard(props) {
 
     return (
         <div className="bg-white rounded-lg w-72 h-96 shadow-xl flex flex-col ">
-            {/* <h1>{product.name}</h1> */}
+            
 
             <img src={product.image[0]} className="w-full h-[70%] object-cover rounded-tl-lg rounded-tr-lg"/>
             <div className="w-full h-[30%] p-4 flex flex-col justify-between">
 
                 <h1 className="text-lg font-semibold">{product.name}</h1>
-               <p className="text-accent  decoration-2">{product.price}</p>
-                <p className="text-accent line-through decoration-2">{getFormattedPrice(labelledPrice)}</p>
+               
+                
 
+                {
+                    product.price > product.labelledPrice && <p className="text-gray-500 line-through decoration-2">{getFormattedPrice(product.labelledPrice)}</p>
+                }
+
+                <p className="text-accent text-lg font-semibold">{getFormattedPrice(product.price)}</p>
             </div>
            
         </div>
