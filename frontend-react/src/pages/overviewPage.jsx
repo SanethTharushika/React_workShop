@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import api from "../utils/api.js";
 import LoadingScreen from "../components/loadingScreen.jsx";
+import ProductImageSlideShow from "../components/productImageSlideShow.jsx";
 
 
 
@@ -38,7 +39,9 @@ export default function OverviewPage() {
             {
                 product != null && <>
 
-                    <div className="w-1/2 bg-red-900 h-full">
+                    <div className="w-1/2  h-full flex justify-center items-center">
+
+                        <ProductImageSlideShow images={product.image}/>
                     
                     </div>
 
