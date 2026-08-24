@@ -2,70 +2,49 @@ import { IoIosAdd } from "react-icons/io";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import toast from "react-hot-toast";
 import LoadingScreen from "../../components/loadingScreen.jsx";
 import ProductDeleteButton from "../../components/productDeleteButton.jsx";
 import { CiEdit } from "react-icons/ci";
-
-const sampleProducts = [
-    {
-        productId: "1",
-        name: "Product 1",
-        price: 19.99,
-        labelledPrice: 24.99,
-        brand: "Brand 1",
-        model: "Model 1",
-        category: "Category 1",
-        isAvailable: true,
-        stock: 10
-    },
-    {
-        productId: "2",
-        name: "Product 2",
-        price: 29.99,
-        labelledPrice: 34.99,
-        brand: "Brand 2",
-        model: "Model 2",
-        category: "Category 2",
-        isAvailable: false,
-        stock: 0
-    },
-    {
-        productId: "3",
-        name: "Product 3",
-        price: 39.99,
-        labelledPrice: 44.99,
-        brand: "Brand 3",
-        model: "Model 3",
-        category: "Category 3",
-        isAvailable: true,
-        stock: 5
-    }
-];
+import { getFormattedPrice } from "../../utils/price-formatter.jsx";
 
 export default function AdminProductPage() {
 
-    const [products, setProducts] = useState(sampleProducts);
+    const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
+        if (!loading) return;
 
-        if (loading) {
-
-            const token = localStorage.getItem("token");
-            api.get("/products", {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }).then((response) => {
+        const token = localStorage.getItem("token");
+        api.get("/products", {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then((response) => {
                 console.log(response.data);
                 setProducts(response.data);
+            })
+            .catch((error) => {
+                console.error("Failed to load products:", error);
+                if (error?.response?.status === 401) {
+                    localStorage.removeItem("token");
+                    toast.error("Session expired. Please sign in again.");
+                    navigate("/signin");
+                    return;
+                }
+
+                toast.error(error?.response?.data?.message || "Failed to load products");
+                setProducts([]);
+            })
+            .finally(() => {
                 setLoading(false);
             });
-
-        }
-    }, [loading]);
+    }, [loading, navigate]);
 
 
     return (
@@ -106,14 +85,14 @@ export default function AdminProductPage() {
                     {
                         products.map(
                             (product) => {
-                                return <tr className="odd:bg-gray-300">
+                                return <tr key={product._id || product.productId} className="odd:bg-gray-300">
                                     <td>
-                                        <img src={product.image} alt={product.name} className="w-16 h-16 object-cover" />
+                                        <img src={product?.image?.[0] || "/default-product-1.png"} alt={product.name} className="w-16 h-16 object-cover" />
                                     </td>
                                     <td>{product.productId}</td>
                                     <td>{product.name}</td>
-                                    <td>${product.price}</td>
-                                    <td>{product.labelledPrice}</td>
+                                    <td>{getFormattedPrice(product.price)}</td>
+                                    <td>{getFormattedPrice(product.labelledPrice)}</td>
                                     <td>{product.brand}</td>
                                     <td>{product.model}</td>
                                     <td>{product.category}</td>

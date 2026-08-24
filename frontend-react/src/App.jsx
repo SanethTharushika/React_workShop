@@ -1,10 +1,10 @@
 import './App.css'
-import ProductCard from './components/productCard.jsx'
 import HomePage from './pages/homePage'
 import LoginPage from './pages/loginPage'
 import RegisterPage from './pages/registerPage'
 import AdminPage from './pages/adminPage'
 import TestPage from './pages/testPage'
+
 
 import { Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
@@ -24,6 +24,7 @@ function App() {
       <Route path="/signup" element={<RegisterPage />} />
       <Route path="/admin/*" element={<AdminPage />} />
       <Route path="/test" element={<TestPage />} />
+      
     </Routes> 
     </div>
   )
