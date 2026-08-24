@@ -13,7 +13,7 @@ export default function ProductCard(props) {
     const labelledPrice = Number(product.labelledPrice);
 
     return (
-        <Link to="/overview" state={{ product }} className="bg-white rounded-lg w-72 h-96 shadow-xl flex flex-col ">
+        <Link to={"/overview/"+product.productId} state={{ product }} className="bg-white rounded-lg w-72 h-96 shadow-xl flex flex-col ">
             
 
             <img src={product?.image?.[0] || "/default-product-1.png"} className="w-full h-[70%] object-cover rounded-tl-lg rounded-tr-lg"/>
