@@ -12,7 +12,7 @@ export default function CartPage() {
                     (cartItem, index) => {
                         return (
                             <div className="w-[600px] h-[150px] shadow-2xl my-4 flex-row"key={index}>
-                                <img src={cartItem.product.image}/>
+                                <img src={cartItem.product.image} className="h-full aspect-square"/>
                                 </div>
                         )
                     }

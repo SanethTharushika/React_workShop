@@ -6,6 +6,8 @@ import api from "../utils/api.js";
 import LoadingScreen from "../components/loadingScreen.jsx";
 import ProductImageSlideShow from "../components/productImageSlideShow.jsx";
 import { getFormattedPrice } from "../utils/price-formatter.jsx";
+import { addToCart, getCart } from "../utils/cart.js";
+import { toast } from "react-hot-toast";
 
 
 
@@ -68,8 +70,19 @@ export default function OverviewPage() {
                         <p className="text-xl text-accent font-semibold">{getFormattedPrice(product.price)}</p>
                         <p className="text-gray-700 mt-6">{product.description}</p>
                         <div className="flex">
-                            <button className="w-[220px] p-2 text-white bg-accent rounded-sm hover:bg-accent/80 mt-6 shadow-lg shadow-accent/30 transition-shadow">Add to Cart</button>
-                            <button className="w-[220px] p-2 text-gray-700 bg-gray-300 rounded-sm hover:bg-gray-400 mt-6 ml-4 shadow-lg shadow-gray-400/40 transition-shadow">Buy Now</button>
+                            <button className="w-[220px] p-2 text-white bg-accent rounded-sm hover:bg-accent/80 mt-6 shadow-lg shadow-accent/30 transition-shadow" onClick={
+                                () => {
+                                    addToCart(product , 1);
+                                    toast.success("Product added to Cart");
+                                }
+
+                            }>Add to Cart</button>
+                            <button className="w-[220px] p-2 text-gray-700 bg-gray-300 rounded-sm hover:bg-gray-400 mt-6 ml-4 shadow-lg shadow-gray-400/40 transition-shadow" onClick={
+                                () => {
+                                    const cart = getCart();
+                                    console.log(cart);
+                                }
+                            }>Buy Now</button>
 
                         </div>
                     </div>
