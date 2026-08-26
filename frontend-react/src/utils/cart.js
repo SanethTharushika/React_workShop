@@ -1,9 +1,11 @@
+
+
 export function getCart() {
 
     const cartString = localStorage.getItem("cart");
 
     if (cartString == null) {
-        localStorage.setItem("cart", []);
+        localStorage.setItem("cart", JSON.stringify([]));
         return [];
     }
 
@@ -57,13 +59,13 @@ export function addToCart(product, quantity) {
 
 }
 
-export function getTotal() {
+export function getTotal(cartItems) {
 
-    const cart = getCart();
+    const items = cartItems ?? getCart();
 
     let total = 0;
 
-    cart.forEach((item) => {
+    items.forEach((item) => {
 
         total += item.product.price * item.quantity;
 
@@ -71,6 +73,9 @@ export function getTotal() {
 
     return total;
 }
+
+
+
 
 
 
