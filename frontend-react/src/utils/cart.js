@@ -1,4 +1,23 @@
-
+const sampleCart = [
+    {
+        product: {
+            productId: "1",
+            name: "Product 1",
+            price: 100,
+            labelledPrice: 150
+    },
+    quantity: 2
+    },
+    {
+        product: {
+            productId: "2",
+            name: "Product 2",
+            price: 200,
+            labelledPrice: 250
+        },
+        quantity: 1
+    }
+];
 
 export function getCart() {
 
