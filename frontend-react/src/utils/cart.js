@@ -1,23 +1,25 @@
-const sampleCart = [
-    {
-        product: {
-            productId: "1",
-            name: "Product 1",
-            price: 100,
-            labelledPrice: 150
-    },
-    quantity: 2
-    },
-    {
-        product: {
-            productId: "2",
-            name: "Product 2",
-            price: 200,
-            labelledPrice: 250
+    const sampleCart = [
+        {
+            product: {
+                productId: "1",
+                name: "Product 1",
+                price: 100,
+                image: "https://placehold.co/300x200",
+                labelledPrice: 150
         },
-        quantity: 1
-    }
-];
+        quantity: 2
+        },
+        {
+            product: {
+                productId: "2",
+                name: "Product 2",
+                price: 200,
+                image: "https://picsum.photos/300/200",
+                labelledPrice: 250
+            },
+            quantity: 1
+        }
+    ];
 
 export function getCart() {
 
