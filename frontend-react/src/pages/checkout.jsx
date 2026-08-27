@@ -1,14 +1,11 @@
 import { useState } from "react";
 import { addToCart, getCart, getTotal } from "../utils/cart.js";
 import { getFormattedPrice } from "../utils/price-formatter.jsx";
-import { Link } from "react-router-dom";
-import { useLocation } from "react-router-dom";
 
-export default function CartPage() {
 
-    const location =useLocation();
-    const data = location.state;
-    const [cart, setCart] = useState(data ?? getCart());
+export default function CheckoutPage() {
+
+    const [cart, setCart] = useState(getCart());
 
 
     return (
@@ -64,7 +61,7 @@ export default function CartPage() {
             }
 
             <div className="w-[600px] h-[150px] shadow-2xl bg-white my-4 flex flex-row justify-between items-center p-4 sticky bottom-0">
-                <Link to="/checkout" className="w-[220px] p-2 text-white bg-accent rounded-sm hover:bg-accent/90 text-center" state={cart}>CheckOut</Link>
+                <button className="w-[220px] p-2 text-white bg-accent rounded-sm hover:bg-accent/90">Order Now</button>
                 <div className="flex justify-end h-full items-center">
                     <span className="text-gray-500 text-lg mr-4">Total:</span>
                     <span className="text-accent text-2xl font-semibold">
