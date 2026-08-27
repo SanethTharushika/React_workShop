@@ -8,6 +8,7 @@ import ProductImageSlideShow from "../components/productImageSlideShow.jsx";
 import { getFormattedPrice } from "../utils/price-formatter.jsx";
 import { addToCart, getCart } from "../utils/cart.js";
 import { toast } from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 
 
@@ -77,12 +78,24 @@ export default function OverviewPage() {
                                 }
 
                             }>Add to Cart</button>
-                            <button className="w-[220px] p-2 text-gray-700 bg-gray-300 rounded-sm hover:bg-gray-400 mt-6 ml-4 shadow-lg shadow-gray-400/40 transition-shadow" onClick={
-                                () => {
-                                    const cart = getCart();
-                                    console.log(cart);
-                                }
-                            }>Buy Now</button>
+                            <Link  className="w-[220px] p-2 text-gray-700 bg-gray-300 rounded-sm hover:bg-gray-400 mt-6 ml-4 shadow-lg shadow-gray-400/40 transition-shadow text-center"
+                            to="/checkout"
+                            state={
+                                [
+                                    {
+                                        product: {
+                                            productId: product.productId,
+                                            name: product.name,
+                                            price: product.price,
+                                            image: product.image[0],
+                                            labelledPrice: product.labelledPrice
+                                        },
+                                        quantity: 1
+                                    }
+                                ]
+                            }
+                            >Buy Now</Link>
+
 
                         </div>
                     </div>

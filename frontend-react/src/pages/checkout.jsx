@@ -1,11 +1,13 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { addToCart, getCart, getTotal } from "../utils/cart.js";
 import { getFormattedPrice } from "../utils/price-formatter.jsx";
 
 
 export default function CheckoutPage() {
 
-    const [cart, setCart] = useState(getCart());
+    const location = useLocation();
+    const [cart, setCart] = useState(location.state ?? getCart());
 
 
     return (
