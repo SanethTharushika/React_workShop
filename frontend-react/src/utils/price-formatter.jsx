@@ -1,3 +1,10 @@
 export function getFormattedPrice(price) {
-    return Number.isFinite(price) ? price.toLocaleString() : "Price unavailable";
+    const numericPrice = Number(price);
+
+    return Number.isFinite(numericPrice)
+        ? `LKR ${numericPrice.toLocaleString("en-LK", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })}`
+        : "Price unavailable";
 }
