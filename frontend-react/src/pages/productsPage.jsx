@@ -10,19 +10,17 @@ export default function ProductsPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (loading) {
-           
-            api.get("/products")
+        api.get("/products")
             .then((response) => {
                 setProducts(response.data);
-                setLoading(false);
             })
             .catch((error) => {
                 console.error("Error fetching products:", error);
+            })
+            .finally(() => {
                 setLoading(false);
             });
-        }
-    }, [loading]);
+    }, []);
 
     return (
         <div className="w-full bg-primary flex justify-center items-center gap-6 p-20 flex-wrap">
@@ -33,13 +31,12 @@ export default function ProductsPage() {
            {
                 !loading && <>
                     {
-                        products.map((product)=> {
+                        products.map((product) => {
                             return (
-                                <ProductCard key={product._id} product={product}/>
-
-                            )
-                        }
-                    )}
+                                <ProductCard key={product._id || product.productId} product={product} />
+                            );
+                        })
+                    }
                 
                 
                 </>
