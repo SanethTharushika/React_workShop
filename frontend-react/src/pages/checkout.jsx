@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import {  getTotal } from "../utils/cart.js";
 import { getFormattedPrice } from "../utils/price-formatter.jsx";
+import { getCart } from "../utils/cart.js";
+import CreateOrder from "../components/creatOrder.jsx";
 
 
 export default function CheckoutPage() {
@@ -69,7 +71,7 @@ export default function CheckoutPage() {
             }
 
             <div className="w-[600px] h-[150px] shadow-2xl bg-white my-4 flex flex-row justify-between items-center p-4 sticky bottom-0">
-                <button className="w-[220px] p-2 text-white bg-accent rounded-sm hover:bg-accent/90">Order Now</button>
+                <CreateOrder cart={cart} />
                 <div className="flex justify-end h-full items-center">
                     <span className="text-gray-500 text-lg mr-4">Total:</span>
                     <span className="text-accent text-2xl font-semibold">
