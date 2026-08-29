@@ -32,6 +32,7 @@ const orderSchema = new mongoose.Schema(
                 },
 
 
+
             },
             email: {
                 type: String,
@@ -78,7 +79,11 @@ const orderSchema = new mongoose.Schema(
                 default: 1,
             }
         }
-    ]
+    ],
+    totalAmount: {
+        type: Number,
+        required: true,
+    }
   }
 )
 
