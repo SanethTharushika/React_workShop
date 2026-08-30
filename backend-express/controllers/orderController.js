@@ -1,6 +1,7 @@
 import Order from "../models/order.js";
 import Product from "../models/product.js";
 
+
 export async function createOrder(req, res) {
 
     try {
@@ -92,26 +93,68 @@ export async function createOrder(req, res) {
 
 export async function getAllOrders(req, res) {
 
-        if(req.user == null) {
-            res.status(401).json({ message: "Unauthorized" });
-            return;
-        }
-
-        try {
-
-            if(req.user.isAdmin) {
-
-                const orders = await Order.find();
-                res.json(orders);
-            }else {
-                
-            }
-
-        }catch (error) {
-            res.status(500).json({ message: error.message });
-        }
-
+    if (req.user == null) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
     }
+
+    try {
+
+        if (req.user.isAdmin) {
+
+            const pageSizeInString = req.query.pageSize || "10";
+
+            const pageNumberInString = req.query.pageNumber || "1";
+
+            const pageSize = parseInt(pageSizeInString);
+
+            const pageNumber = parseInt(pageNumberInString);
+
+            const orderCount = await Order.countDocuments();
+
+            const totalPages = Math.ceil(orderCount / pageSize);
+
+            const orders = await Order.find().sort({ date: -1 }).skip((pageNumber - 1) * pageSize).limit(pageSize);
+            res.json({
+                orders: orders,
+                totalPages: totalPages,
+                currentPage: pageNumber,
+                totalOrders: orderCount
+
+            });
+        } else {
+
+            const pageSizeInString = req.query.pageSize || "10";
+
+            const pageNumberInString = req.query.pageNumber || "1";
+
+            const pageSize = parseInt(pageSizeInString);
+
+            const pageNumber = parseInt(pageNumberInString);
+
+            const orderCount = await Order.countDocuments({ email: req.user.email });
+
+            const totalPages = Math.ceil(orderCount / pageSize);
+
+            const orders = await Order.find({ email: req.user.email }).sort({ date: -1 }).skip((pageNumber - 1) * pageSize).limit(pageSize);
+            res.json({
+                orders: orders,
+                totalPages: totalPages,
+                currentPage: pageNumber,
+                totalOrders: orderCount
+
+            });
+
+
+
+
+        }
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+
+}
 
 
 
