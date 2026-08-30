@@ -88,4 +88,30 @@ export async function createOrder(req, res) {
         res.status(500).json({ message: error.message });
     }
 
-} 
+}
+
+export async function getAllOrders(req, res) {
+
+        if(req.user == null) {
+            res.status(401).json({ message: "Unauthorized" });
+            return;
+        }
+
+        try {
+
+            if(req.user.isAdmin) {
+
+                const orders = await Order.find();
+                res.json(orders);
+            }else {
+                
+            }
+
+        }catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+
+    }
+
+
+
