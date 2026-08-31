@@ -5,6 +5,7 @@ import { FaRegUser } from "react-icons/fa";
 import AdminProductPage from "./admin/adminProductPage";
 import AdminAddProductForm from "./admin/adminAddProductForm";
 import AdminEditProductForm from "./admin/adminEditProductForm";
+import AdminOrdersPage from "./admin/adminOrdersPage";
 
 
 export default function AdminPage() {
@@ -40,7 +41,7 @@ export default function AdminPage() {
             <div className="w-[calc(100%-300px)] min-h-screen p-4 flex">
 
                 <Routes>
-                    <Route index element={<h1>Orders page</h1>} />
+                    <Route index element={<AdminOrdersPage/>} />
                     <Route path="products" element={<AdminProductPage/>} />
                     <Route path="users" element={<h1>Users-page</h1>} />
                     <Route path="add-product" element={<AdminAddProductForm/>} />
