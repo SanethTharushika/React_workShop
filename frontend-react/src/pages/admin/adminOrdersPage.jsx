@@ -11,6 +11,9 @@ export default function AdminOrdersPage() {
     const [orders, setOrders] = useState([]);
     const [totalOrders, setTotalOrders] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [pageNumber, setPageNumber] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
 
     const navigate = useNavigate();
 
@@ -19,7 +22,7 @@ export default function AdminOrdersPage() {
 
         const token = localStorage.getItem("token");
 
-       api.get("/orders/1/10",  {
+       api.get("/orders/"+pageNumber+"/"+pageSize,  {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -31,6 +34,10 @@ export default function AdminOrdersPage() {
                 setOrders(response.data.orders);
 
                 setTotalOrders(response.data.totalOrders);
+
+                setTotalPages(response.data.totalPages);
+
+
             })
             .catch((error) => {
 
@@ -76,7 +83,7 @@ export default function AdminOrdersPage() {
 
     return (
 
-        <div className="w-full h-full p-5">
+        <div className="w-full h-full p-5 flex flex-col items-center">
 
 
             {/* Header */}
@@ -113,7 +120,7 @@ export default function AdminOrdersPage() {
 
             {orders.length === 0 ? (
 
-                <div className="w-full text-center text-gray-500 text-xl">
+                <div className="w-full text-center text-gray-500 text-xl ">
 
                     No orders found
 
@@ -127,6 +134,7 @@ export default function AdminOrdersPage() {
                         text-center
                         overflow-hidden
                         rounded-lg
+                        
                     "
                 >
 
@@ -318,7 +326,11 @@ export default function AdminOrdersPage() {
 
                 </table>
 
+              
             )}
+
+              <div className="w-[200px] h-[40px] fixed bottom-4 bg-red-900 "></div>
+
 
         </div>
     );

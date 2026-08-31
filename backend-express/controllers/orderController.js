@@ -314,7 +314,6 @@ export async function getAllOrders(req, res) {
         return res.json({
             orders: orders,
             totalPages: totalPages,
-            currentPage: pageNumber,
             totalOrders: orderCount
         });
 
