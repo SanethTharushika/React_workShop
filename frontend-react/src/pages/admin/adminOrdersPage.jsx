@@ -11,6 +11,7 @@ export default function AdminOrdersPage() {
     const [orders, setOrders] = useState([]);
     const [totalOrders, setTotalOrders] = useState(0);
     const [loading, setLoading] = useState(true);
+
     const [pageNumber, setPageNumber] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
@@ -22,21 +23,34 @@ export default function AdminOrdersPage() {
 
         const token = localStorage.getItem("token");
 
-       api.get("/orders/"+pageNumber+"/"+pageSize,  {
-            headers: {
-                Authorization: `Bearer ${token}`
+        setLoading(true);
+
+        api.get(
+            "/orders/" + pageNumber + "/" + pageSize,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             }
-        })
+        )
             .then((response) => {
 
-                console.log("Orders response:", response.data);
+                console.log(
+                    "Orders response:",
+                    response.data
+                );
 
-                setOrders(response.data.orders);
+                setOrders(
+                    response.data.orders || []
+                );
 
-                setTotalOrders(response.data.totalOrders);
+                setTotalOrders(
+                    response.data.totalOrders || 0
+                );
 
-                setTotalPages(response.data.totalPages);
-
+                setTotalPages(
+                    response.data.totalPages || 1
+                );
 
             })
             .catch((error) => {
@@ -46,7 +60,9 @@ export default function AdminOrdersPage() {
                     error
                 );
 
-                if (error?.response?.status === 401) {
+                if (
+                    error?.response?.status === 401
+                ) {
 
                     localStorage.removeItem("token");
 
@@ -66,6 +82,8 @@ export default function AdminOrdersPage() {
 
                 setOrders([]);
                 setTotalOrders(0);
+                setTotalPages(1);
+
             })
             .finally(() => {
 
@@ -73,11 +91,13 @@ export default function AdminOrdersPage() {
 
             });
 
-    }, [navigate]);
+    }, [navigate, pageNumber, pageSize]);
 
 
     if (loading) {
+
         return <LoadingScreen />;
+
     }
 
 
@@ -107,6 +127,7 @@ export default function AdminOrdersPage() {
                     All Orders
                 </h1>
 
+
                 <div className="h-full gap-4 flex items-center">
 
                     {totalOrders} Orders
@@ -116,221 +137,354 @@ export default function AdminOrdersPage() {
             </div>
 
 
-            {/* No Orders */}
+            {/* Orders Table */}
 
-            {orders.length === 0 ? (
+            {
+                orders.length === 0 ? (
 
-                <div className="w-full text-center text-gray-500 text-xl ">
-
-                    No orders found
-
-                </div>
-
-            ) : (
-
-                <table
-                    className="
-                        w-full
-                        text-center
-                        overflow-hidden
-                        rounded-lg
-                        
-                    "
-                >
-
-                    <thead
+                    <div
                         className="
-                            h-[40px]
-                            bg-accent
-                            text-white
-                            font-semibold
+                            w-full
+                            text-center
+                            text-gray-500
+                            text-xl
+                        "
+                    >
+                        No orders found
+                    </div>
+
+                ) : (
+
+                    <table
+                        className="
+                            w-full
+                            text-center
+                            overflow-hidden
+                            rounded-lg
+                            bg-white
                         "
                     >
 
-                        <tr>
+                        <thead
+                            className="
+                                h-[40px]
+                                bg-accent
+                                text-white
+                                font-semibold
+                            "
+                        >
 
-                            <td className="w-[5%]">
-                                Order ID
-                            </td>
+                            <tr>
 
-                            <td className="w-[10%]">
-                                Email
-                            </td>
+                                <td className="w-[5%]">
+                                    Order ID
+                                </td>
 
-                            <td className="w-[15%]">
-                                Name
-                            </td>
+                                <td className="w-[10%]">
+                                    Email
+                                </td>
 
-                            <td className="w-[8%]">
-                                City
-                            </td>
+                                <td className="w-[15%]">
+                                    Name
+                                </td>
 
-                            <td className="w-[10%]">
-                                Phone
-                            </td>
+                                <td className="w-[8%]">
+                                    City
+                                </td>
 
-                            <td className="w-[8%]">
-                                Status
-                            </td>
+                                <td className="w-[10%]">
+                                    Phone
+                                </td>
 
-                            <td className="w-[12%]">
-                                Date
-                            </td>
+                                <td className="w-[8%]">
+                                    Status
+                                </td>
 
-                            <td className="w-[12%]">
-                                Total Amount
-                            </td>
+                                <td className="w-[12%]">
+                                    Date
+                                </td>
 
-                            <td className="w-[10%]">
-                                Actions
-                            </td>
+                                <td className="w-[12%]">
+                                    Total Amount
+                                </td>
 
-                        </tr>
+                                <td className="w-[10%]">
+                                    Actions
+                                </td>
 
-                    </thead>
+                            </tr>
 
-
-                    <tbody>
-
-                        {orders.map((order) => {
-
-                            // Customer/order details are stored
-                            // inside the first item in your schema
-                            const firstItem = order.items?.[0];
-
-                            return (
-
-                                <tr
-                                    key={order._id}
-                                    className="odd:bg-gray-300"
-                                >
-
-                                    {/* Order ID */}
-
-                                    <td className="p-3">
-
-                                        {order.orderId}
-
-                                    </td>
+                        </thead>
 
 
-                                    {/* Email */}
+                        <tbody>
 
-                                    <td className="p-3">
+                            {
+                                orders.map((order) => {
 
-                                        {firstItem?.email || "N/A"}
+                                    const firstItem =
+                                        order.items?.[0];
 
-                                    </td>
+                                    return (
 
-
-                                    {/* Customer Name */}
-
-                                    <td className="p-3">
-
-                                        {firstItem
-                                            ? `${firstItem.firstName} ${firstItem.lastName}`
-                                            : "N/A"
-                                        }
-
-                                    </td>
-
-
-                                    {/* City */}
-
-                                    <td className="p-3">
-
-                                        {firstItem?.city || "N/A"}
-
-                                    </td>
-
-
-                                    {/* Phone */}
-
-                                    <td className="p-3">
-
-                                        {firstItem?.phone || "N/A"}
-
-                                    </td>
-
-
-                                    {/* Status */}
-
-                                    <td className="p-3">
-
-                                        {firstItem?.status || "N/A"}
-
-                                    </td>
-
-
-                                    {/* Date */}
-
-                                    <td className="p-3">
-
-                                        {firstItem?.date
-                                            ? new Date(
-                                                firstItem.date
-                                            ).toLocaleDateString()
-                                            : "N/A"
-                                        }
-
-                                    </td>
-
-
-                                    {/* Total Amount */}
-
-                                    <td className="p-3">
-
-                                        {getFormattedPrice(
-                                            order.totalAmount
-                                        )}
-
-                                    </td>
-
-
-                                    {/* Actions */}
-
-                                    <td className="p-3">
-
-                                        <button
+                                        <tr
+                                            key={order._id}
                                             className="
-                                                bg-blue-500
-                                                text-white
-                                                px-4
-                                                py-2
-                                                rounded-lg
-                                                hover:bg-blue-700
+                                                odd:bg-gray-300
+                                                even:bg-white
                                             "
-                                            onClick={() => {
-
-                                                console.log(
-                                                    "Selected Order:",
-                                                    order
-                                                );
-
-                                            }}
                                         >
 
-                                            View
+                                            <td className="p-3">
 
-                                        </button>
+                                                {
+                                                    order.orderId
+                                                }
 
-                                    </td>
+                                            </td>
 
-                                </tr>
 
-                            );
+                                            <td className="p-3">
 
-                        })}
+                                                {
+                                                    firstItem?.email ||
+                                                    "N/A"
+                                                }
 
-                    </tbody>
+                                            </td>
 
-                </table>
 
-              
-            )}
+                                            <td className="p-3">
 
-              <div className="w-[200px] h-[40px] fixed bottom-4 bg-red-900 "></div>
+                                                {
+                                                    firstItem
+                                                        ? `${firstItem.firstName} ${firstItem.lastName}`
+                                                        : "N/A"
+                                                }
 
+                                            </td>
+
+
+                                            <td className="p-3">
+
+                                                {
+                                                    firstItem?.city ||
+                                                    "N/A"
+                                                }
+
+                                            </td>
+
+
+                                            <td className="p-3">
+
+                                                {
+                                                    firstItem?.phone ||
+                                                    "N/A"
+                                                }
+
+                                            </td>
+
+
+                                            <td className="p-3">
+
+                                                {
+                                                    firstItem?.status ||
+                                                    "N/A"
+                                                }
+
+                                            </td>
+
+
+                                            <td className="p-3">
+
+                                                {
+                                                    firstItem?.date
+                                                        ? new Date(
+                                                            firstItem.date
+                                                        )
+                                                            .toLocaleDateString()
+                                                        : "N/A"
+                                                }
+
+                                            </td>
+
+
+                                            <td className="p-3">
+
+                                                {
+                                                    getFormattedPrice(
+                                                        order.totalAmount
+                                                    )
+                                                }
+
+                                            </td>
+
+
+                                            <td className="p-3">
+
+                                                <button
+                                                    className="
+                                                        bg-blue-500
+                                                        text-white
+                                                        px-4
+                                                        py-2
+                                                        rounded-lg
+                                                        hover:bg-blue-700
+                                                    "
+                                                    onClick={() => {
+
+                                                        console.log(
+                                                            "Selected Order:",
+                                                            order
+                                                        );
+
+                                                    }}
+                                                >
+                                                    View
+                                                </button>
+
+                                            </td>
+
+                                        </tr>
+
+                                    );
+
+                                })
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                )
+            }
+
+
+            {/* Pagination */}
+
+            <div
+                className="
+                    p-4
+                    mt-10
+                    mb-5
+                    bg-white
+                    shadow-2xl
+                    rounded-lg
+                    flex
+                    justify-center
+                    items-center
+                    gap-4
+                    fixed bottom-4
+                "
+            >
+
+                {/* Page Size */}
+
+                <select
+                    value={pageSize}
+                    onChange={(e) => {
+
+                        setPageSize(
+                            Number(e.target.value)
+                        );
+
+                        setPageNumber(1);
+
+                    }}
+                    className="
+                        w-[150px]
+                        h-[40px]
+                        bg-white
+                        text-black
+                        border
+                        border-gray-300
+                        rounded-lg
+                        px-2
+                    "
+                >
+
+                    <option value={2}>
+                        2 per page
+                    </option>
+
+                    <option value={5}>
+                        5 per page
+                    </option>
+
+                    <option value={10}>
+                        10 per page
+                    </option>
+
+                    <option value={20}>
+                        20 per page
+                    </option>
+
+                </select>
+
+
+                {/* Previous */}
+
+                <button
+                    disabled={pageNumber === 1}
+                    onClick={() => {
+
+                        setPageNumber(
+                            (previousPage) =>
+                                previousPage - 1
+                        );
+
+                    }}
+                    className="
+                        px-4
+                        py-2
+                        bg-gray-300
+                        rounded-lg
+                        hover:bg-gray-400
+                        disabled:opacity-50
+                        disabled:cursor-not-allowed
+                    "
+                >
+                    Previous
+                </button>
+
+
+                {/* Page Number */}
+
+                <span className="font-medium">
+
+                    Page {pageNumber} of {totalPages}
+
+                </span>
+
+
+                {/* Next */}
+
+                <button
+                    disabled={
+                        pageNumber >= totalPages
+                    }
+                    onClick={() => {
+
+                        setPageNumber(
+                            (previousPage) =>
+                                previousPage + 1
+                        );
+
+                    }}
+                    className="
+                        px-4
+                        py-2
+                        bg-gray-300
+                        rounded-lg
+                        hover:bg-gray-400
+                        disabled:opacity-50
+                        disabled:cursor-not-allowed
+                    "
+                >
+                    Next
+                </button>
+
+            </div>
 
         </div>
     );

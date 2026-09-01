@@ -124,7 +124,7 @@ export async function createOrder(req, res) {
             }
 
 
-            // Add item according to your Order schema
+            // Add item according to Order model
             orderData.items.push({
 
                 product: {
@@ -189,13 +189,16 @@ export async function createOrder(req, res) {
                         requestedItem.productId
                 });
 
+
             productItem.stock -=
                 requestedItem.quantity;
+
 
             await productItem.save();
         }
 
 
+        // Success response
         return res.status(201).json({
 
             message:
@@ -214,6 +217,7 @@ export async function createOrder(req, res) {
         console.error(error);
 
 
+        // Duplicate Order ID
         if (error.code === 11000) {
 
             return res.status(409).json({
@@ -233,6 +237,7 @@ export async function createOrder(req, res) {
 
 export async function getAllOrders(req, res) {
 
+    // Check authentication
     if (req.user == null) {
 
         return res.status(401).json({
@@ -243,11 +248,45 @@ export async function getAllOrders(req, res) {
 
     try {
 
-        const pageSize =
-            parseInt(req.query.pageSize || "10");
+        // =========================
+        // PAGINATION
+        // =========================
+
+        // Route:
+        // /orders/:pageNumber/:pageSize
 
         const pageNumber =
-            parseInt(req.query.pageNumber || "1");
+            parseInt(req.params.pageNumber || "1");
+
+        const pageSize =
+            parseInt(req.params.pageSize || "10");
+
+
+        console.log("Page Number:", pageNumber);
+        console.log("Page Size:", pageSize);
+
+
+        // Validate pagination values
+        if (
+            isNaN(pageNumber) ||
+            pageNumber < 1
+        ) {
+
+            return res.status(400).json({
+                message: "Invalid page number"
+            });
+        }
+
+
+        if (
+            isNaN(pageSize) ||
+            pageSize < 1
+        ) {
+
+            return res.status(400).json({
+                message: "Invalid page size"
+            });
+        }
 
 
         // =========================
@@ -259,14 +298,21 @@ export async function getAllOrders(req, res) {
             const orderCount =
                 await Order.countDocuments();
 
+
             const totalPages =
-                Math.ceil(
-                    orderCount / pageSize
+                Math.max(
+                    1,
+                    Math.ceil(
+                        orderCount / pageSize
+                    )
                 );
+
 
             const orders =
                 await Order.find()
-                    .sort({ orderId: -1 })
+                    .sort({
+                        orderId: -1
+                    })
                     .skip(
                         (pageNumber - 1) *
                         pageSize
@@ -274,11 +320,22 @@ export async function getAllOrders(req, res) {
                     .limit(pageSize);
 
 
-            return res.json({
-                orders: orders,
-                totalPages: totalPages,
-                currentPage: pageNumber,
-                totalOrders: orderCount
+            return res.status(200).json({
+
+                orders:
+                    orders,
+
+                totalPages:
+                    totalPages,
+
+                currentPage:
+                    pageNumber,
+
+                pageSize:
+                    pageSize,
+
+                totalOrders:
+                    orderCount
             });
         }
 
@@ -287,23 +344,33 @@ export async function getAllOrders(req, res) {
         // NORMAL USER
         // =========================
 
-        // Email is inside items according to your model
+        // email is inside items
         const filter = {
-            "items.email": req.user.email
+            "items.email":
+                req.user.email
         };
 
 
         const orderCount =
-            await Order.countDocuments(filter);
+            await Order.countDocuments(
+                filter
+            );
+
 
         const totalPages =
-            Math.ceil(
-                orderCount / pageSize
+            Math.max(
+                1,
+                Math.ceil(
+                    orderCount / pageSize
+                )
             );
+
 
         const orders =
             await Order.find(filter)
-                .sort({ orderId: -1 })
+                .sort({
+                    orderId: -1
+                })
                 .skip(
                     (pageNumber - 1) *
                     pageSize
@@ -311,16 +378,32 @@ export async function getAllOrders(req, res) {
                 .limit(pageSize);
 
 
-        return res.json({
-            orders: orders,
-            totalPages: totalPages,
-            totalOrders: orderCount
+        return res.status(200).json({
+
+            orders:
+                orders,
+
+            totalPages:
+                totalPages,
+
+            currentPage:
+                pageNumber,
+
+            pageSize:
+                pageSize,
+
+            totalOrders:
+                orderCount
         });
 
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Get all orders error:",
+            error
+        );
+
 
         return res.status(500).json({
             message: error.message
