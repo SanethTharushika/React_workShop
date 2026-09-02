@@ -1,658 +1,219 @@
-import {
-    useEffect,
-    useState
-} from "react";
-
-import {
-    useNavigate
-} from "react-router-dom";
-
-import api
-    from "../../utils/api";
-
-import toast
-    from "react-hot-toast";
-
-import LoadingScreen
-    from "../../components/loadingScreen.jsx";
-
-import {
-    getFormattedPrice
-} from "../../utils/price-formatter.jsx";
-
-import AdminOrderDataModel
-    from "../../components/adminOrderDataModel.jsx";
-
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../../utils/api";
+import toast from "react-hot-toast";
+import LoadingScreen from "../../components/loadingScreen.jsx";
+import { getFormattedPrice } from "../../utils/price-formatter.jsx";
+import AdminOrderDataModel from "../../components/orderDataModel.jsx";
 
 export default function AdminOrdersPage() {
 
-    const [
-        orders,
-        setOrders
-    ] = useState(
-        []
-    );
+    const [orders, setOrders] = useState([]);
+    const [totalOrders, setTotalOrders] = useState(0);
+    const [loading, setLoading] = useState(true);
 
-    const [
-        totalOrders,
-        setTotalOrders
-    ] = useState(
-        0
-    );
+    const [pageNumber, setPageNumber] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
 
-    const [
-        loading,
-        setLoading
-    ] = useState(
-        true
-    );
+    const navigate = useNavigate();
 
-    const [
-        pageNumber,
-        setPageNumber
-    ] = useState(
-        1
-    );
+    useEffect(() => {
 
-    const [
-        pageSize,
-        setPageSize
-    ] = useState(
-        10
-    );
+        const token = localStorage.getItem("token");
 
-    const [
-        totalPages,
-        setTotalPages
-    ] = useState(
-        1
-    );
+        setLoading(true);
 
-    const navigate =
-        useNavigate();
+        api.get(`/orders/${pageNumber}/${pageSize}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then((response) => {
 
+                console.log("Orders response:", response.data);
 
-    useEffect(
-        () => {
+                setOrders(response.data.orders || []);
+                setTotalOrders(response.data.totalOrders || 0);
+                setTotalPages(response.data.totalPages || 1);
 
-            const token =
-                localStorage.getItem(
-                    "token"
+            })
+            .catch((error) => {
+
+                console.error("Failed to load orders:", error);
+
+                if (error?.response?.status === 401) {
+                    localStorage.removeItem("token");
+                    toast.error("Session expired. Please sign in again.");
+                    navigate("/signin");
+                    return;
+                }
+
+                toast.error(
+                    error?.response?.data?.message ||
+                    "Failed to load orders"
                 );
 
-            setLoading(
-                true
-            );
+                setOrders([]);
+                setTotalOrders(0);
+                setTotalPages(1);
 
-            api.get(
-                "/orders/" +
-                pageNumber +
-                "/" +
-                pageSize,
-                {
-                    headers: {
-                        Authorization:
-                            `Bearer ${token}`
-                    }
-                }
-            )
-            .then(
-                (response) => {
+            })
+            .finally(() => {
+                setLoading(false);
+            });
 
-                    console.log(
-                        "Orders response:",
-                        response.data
-                    );
+    }, [navigate, pageNumber, pageSize]);
 
-                    setOrders(
-                        response.data.orders ||
-                        []
-                    );
-
-                    setTotalOrders(
-                        response.data.totalOrders ||
-                        0
-                    );
-
-                    setTotalPages(
-                        response.data.totalPages ||
-                        1
-                    );
-                }
-            )
-            .catch(
-                (error) => {
-
-                    console.error(
-                        "Failed to load orders:",
-                        error
-                    );
-
-                    if (
-                        error?.response?.status ===
-                        401
-                    ) {
-
-                        localStorage.removeItem(
-                            "token"
-                        );
-
-                        toast.error(
-                            "Session expired. Please sign in again."
-                        );
-
-                        navigate(
-                            "/signin"
-                        );
-
-                        return;
-                    }
-
-                    toast.error(
-                        error?.response?.data?.message ||
-                        "Failed to load orders"
-                    );
-
-                    setOrders(
-                        []
-                    );
-
-                    setTotalOrders(
-                        0
-                    );
-
-                    setTotalPages(
-                        1
-                    );
-                }
-            )
-            .finally(
-                () => {
-
-                    setLoading(
-                        false
-                    );
-                }
-            );
-        },
-        [
-            navigate,
-            pageNumber,
-            pageSize
-        ]
-    );
-
-
-    if (
-        loading
-    ) {
-
-        return (
-            <LoadingScreen />
-        );
+    if (loading) {
+        return <LoadingScreen />;
     }
 
-
     return (
+        <div className="w-full h-full p-5 flex flex-col items-center">
 
-        <div
-            className="
-                w-full
-                h-full
-                p-5
-                flex
-                flex-col
-                items-center
-            "
-        >
+            <div className="w-full h-[100px] bg-white shadow-2xl mb-10 rounded-lg flex p-4 items-center justify-between">
 
-            <div
-                className="
-                    w-full
-                    h-[100px]
-                    bg-white
-                    shadow-2xl
-                    mb-10
-                    rounded-lg
-                    flex
-                    p-4
-                    items-center
-                    justify-between
-                "
-            >
-
-                <h1
-                    className="
-                        text-2xl
-                        font-semibold
-                    "
-                >
-
+                <h1 className="text-2xl font-semibold">
                     All Orders
-
                 </h1>
 
-
-                <div
-                    className="
-                        h-full
-                        flex
-                        items-center
-                    "
-                >
-
-                    {
-                        totalOrders
-                    }
-                    {" "}
-                    Orders
-
+                <div className="h-full flex items-center">
+                    {totalOrders} Orders
                 </div>
 
             </div>
 
+            {orders.length === 0 ? (
 
-            {
-                orders.length === 0
-                    ? (
+                <div className="w-full text-center text-gray-500 text-xl">
+                    No orders found
+                </div>
 
-                        <div
-                            className="
-                                w-full
-                                text-center
-                                text-gray-500
-                                text-xl
-                            "
-                        >
+            ) : (
 
-                            No orders found
+                <table className="w-full text-center overflow-hidden rounded-lg bg-white">
 
-                        </div>
+                    <thead className="h-[40px] bg-accent text-white font-semibold">
+                        <tr>
+                            <td>Order ID</td>
+                            <td>Email</td>
+                            <td>Name</td>
+                            <td>City</td>
+                            <td>Phone</td>
+                            <td>Status</td>
+                            <td>Date</td>
+                            <td>Total Amount</td>
+                            <td>Actions</td>
+                        </tr>
+                    </thead>
 
-                    )
-                    : (
+                    <tbody>
 
-                        <table
-                            className="
-                                w-full
-                                text-center
-                                overflow-hidden
-                                rounded-lg
-                                bg-white
-                            "
-                        >
+                        {orders.map((order) => {
 
-                            <thead
-                                className="
-                                    h-[40px]
-                                    bg-accent
-                                    text-white
-                                    font-semibold
-                                "
-                            >
+                            const firstItem = order.items?.[0];
 
-                                <tr>
+                            return (
+                                <tr
+                                    key={order._id}
+                                    className="odd:bg-gray-300 even:bg-white"
+                                >
 
-                                    <td>
-                                        Order ID
+                                    <td className="p-3">
+                                        {order.orderId}
                                     </td>
 
-                                    <td>
-                                        Email
+                                    <td className="p-3">
+                                        {firstItem?.email || "N/A"}
                                     </td>
 
-                                    <td>
-                                        Name
+                                    <td className="p-3">
+                                        {firstItem
+                                            ? `${firstItem.firstName} ${firstItem.lastName}`
+                                            : "N/A"}
                                     </td>
 
-                                    <td>
-                                        City
+                                    <td className="p-3">
+                                        {firstItem?.city || "N/A"}
                                     </td>
 
-                                    <td>
-                                        Phone
+                                    <td className="p-3">
+                                        {firstItem?.phone || "N/A"}
                                     </td>
 
-                                    <td>
-                                        Status
+                                    <td className="p-3">
+                                        {firstItem?.status || "N/A"}
                                     </td>
 
-                                    <td>
-                                        Date
+                                    <td className="p-3">
+                                        {firstItem?.date
+                                            ? new Date(firstItem.date).toLocaleDateString()
+                                            : "N/A"}
                                     </td>
 
-                                    <td>
-                                        Total Amount
+                                    <td className="p-3">
+                                        {getFormattedPrice(order.totalAmount)}
                                     </td>
 
-                                    <td>
-                                        Actions
+                                    <td className="p-3">
+                                        <div className="w-full flex justify-center items-center">
+
+                                            <AdminOrderDataModel
+                                                order={order}
+                                            />
+
+                                        </div>
                                     </td>
 
                                 </tr>
+                            );
+                        })}
 
-                            </thead>
+                    </tbody>
 
+                </table>
 
-                            <tbody>
+            )}
 
-                                {
-                                    orders.map(
-                                        (order) => {
-
-                                            const firstItem =
-                                                order.items?.[0];
-
-                                            return (
-
-                                                <tr
-                                                    key={
-                                                        order._id
-                                                    }
-                                                    className="
-                                                        odd:bg-gray-300
-                                                        even:bg-white
-                                                    "
-                                                >
-
-                                                    <td
-                                                        className="
-                                                            p-3
-                                                        "
-                                                    >
-
-                                                        {
-                                                            order.orderId
-                                                        }
-
-                                                    </td>
-
-
-                                                    <td
-                                                        className="
-                                                            p-3
-                                                        "
-                                                    >
-
-                                                        {
-                                                            firstItem?.email ||
-                                                            "N/A"
-                                                        }
-
-                                                    </td>
-
-
-                                                    <td
-                                                        className="
-                                                            p-3
-                                                        "
-                                                    >
-
-                                                        {
-                                                            firstItem
-                                                                ? `${firstItem.firstName} ${firstItem.lastName}`
-                                                                : "N/A"
-                                                        }
-
-                                                    </td>
-
-
-                                                    <td
-                                                        className="
-                                                            p-3
-                                                        "
-                                                    >
-
-                                                        {
-                                                            firstItem?.city ||
-                                                            "N/A"
-                                                        }
-
-                                                    </td>
-
-
-                                                    <td
-                                                        className="
-                                                            p-3
-                                                        "
-                                                    >
-
-                                                        {
-                                                            firstItem?.phone ||
-                                                            "N/A"
-                                                        }
-
-                                                    </td>
-
-
-                                                    <td
-                                                        className="
-                                                            p-3
-                                                        "
-                                                    >
-
-                                                        {
-                                                            firstItem?.status ||
-                                                            "N/A"
-                                                        }
-
-                                                    </td>
-
-
-                                                    <td
-                                                        className="
-                                                            p-3
-                                                        "
-                                                    >
-
-                                                        {
-                                                            firstItem?.date
-                                                                ? new Date(
-                                                                    firstItem.date
-                                                                )
-                                                                    .toLocaleDateString()
-                                                                : "N/A"
-                                                        }
-
-                                                    </td>
-
-
-                                                    <td
-                                                        className="
-                                                            p-3
-                                                        "
-                                                    >
-
-                                                        {
-                                                            getFormattedPrice(
-                                                                order.totalAmount
-                                                            )
-                                                        }
-
-                                                    </td>
-
-
-                                                    <td
-                                                        className="
-                                                            p-3
-                                                        "
-                                                    >
-
-                                                        <div
-                                                            className="
-                                                                w-full
-                                                                flex
-                                                                justify-center
-                                                                items-center
-                                                            "
-                                                        >
-
-                                                            <AdminOrderDataModel
-                                                                order={
-                                                                    order
-                                                                }
-                                                            />
-
-                                                        </div>
-
-                                                    </td>
-
-                                                </tr>
-
-                                            );
-                                        }
-                                    )
-                                }
-
-                            </tbody>
-
-                        </table>
-
-                    )
-            }
-
-
-            <div
-                className="
-                    p-4
-                    mt-10
-                    mb-5
-                    bg-white
-                    shadow-2xl
-                    rounded-lg
-                    flex
-                    justify-center
-                    items-center
-                    gap-4
-                "
-            >
+            <div className="p-4 mt-10 mb-5 bg-white shadow-2xl rounded-lg flex justify-center items-center gap-4 fixed bottom-4">
 
                 <select
-                    value={
-                        pageSize
-                    }
-                    onChange={
-                        (e) => {
-
-                            setPageSize(
-                                Number(
-                                    e.target.value
-                                )
-                            );
-
-                            setPageNumber(
-                                1
-                            );
-                        }
-                    }
-                    className="
-                        w-[150px]
-                        h-[40px]
-                        bg-white
-                        text-black
-                        border
-                        border-gray-300
-                        rounded-lg
-                        px-2
-                    "
+                    value={pageSize}
+                    onChange={(e) => {
+                        setPageSize(Number(e.target.value));
+                        setPageNumber(1);
+                    }}
+                    className="w-[150px] h-[40px] bg-white text-black border border-gray-300 rounded-lg px-2"
                 >
-
-                    <option value={2}>
-                        2 per page
-                    </option>
-
-                    <option value={5}>
-                        5 per page
-                    </option>
-
-                    <option value={10}>
-                        10 per page
-                    </option>
-
-                    <option value={20}>
-                        20 per page
-                    </option>
-
+                    <option value={2}>2 per page</option>
+                    <option value={5}>5 per page</option>
+                    <option value={10}>10 per page</option>
+                    <option value={20}>20 per page</option>
                 </select>
 
-
                 <button
-                    disabled={
-                        pageNumber === 1
-                    }
-                    onClick={
-                        () => {
-
-                            setPageNumber(
-                                (previousPage) =>
-                                    previousPage - 1
-                            );
-                        }
-                    }
-                    className="
-                        px-4
-                        py-2
-                        bg-gray-300
-                        rounded-lg
-                        hover:bg-gray-400
-                        disabled:opacity-50
-                        disabled:cursor-not-allowed
-                    "
+                    disabled={pageNumber === 1}
+                    onClick={() => {
+                        setPageNumber((previousPage) => previousPage - 1);
+                    }}
+                    className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-
                     Previous
-
                 </button>
 
-
-                <span
-                    className="
-                        font-medium
-                    "
-                >
-
-                    Page
-                    {" "}
-                    {
-                        pageNumber
-                    }
-                    {" "}
-                    of
-                    {" "}
-                    {
-                        totalPages
-                    }
-
+                <span className="font-medium">
+                    Page {pageNumber} of {totalPages}
                 </span>
 
-
                 <button
-                    disabled={
-                        pageNumber >=
-                        totalPages
-                    }
-                    onClick={
-                        () => {
-
-                            setPageNumber(
-                                (previousPage) =>
-                                    previousPage + 1
-                            );
-                        }
-                    }
-                    className="
-                        px-4
-                        py-2
-                        bg-gray-300
-                        rounded-lg
-                        hover:bg-gray-400
-                        disabled:opacity-50
-                        disabled:cursor-not-allowed
-                    "
+                    disabled={pageNumber >= totalPages}
+                    onClick={() => {
+                        setPageNumber((previousPage) => previousPage + 1);
+                    }}
+                    className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-
                     Next
-
                 </button>
 
             </div>
