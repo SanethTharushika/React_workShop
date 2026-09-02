@@ -11,6 +11,7 @@ export default function AdminOrdersPage() {
     const [orders, setOrders] = useState([]);
     const [totalOrders, setTotalOrders] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     const [pageNumber, setPageNumber] = useState(1);
     const [pageSize, setPageSize] = useState(10);
@@ -63,7 +64,7 @@ export default function AdminOrdersPage() {
                 setLoading(false);
             });
 
-    }, [navigate, pageNumber, pageSize]);
+    }, [navigate, pageNumber, pageSize, refreshTrigger]);
 
     if (loading) {
         return <LoadingScreen />;
@@ -161,6 +162,7 @@ export default function AdminOrdersPage() {
 
                                             <AdminOrderDataModel
                                                 order={order}
+                                                refresh={() => setRefreshTrigger((value) => value + 1)}
                                             />
 
                                         </div>

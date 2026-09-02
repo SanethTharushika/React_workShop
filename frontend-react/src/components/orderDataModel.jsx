@@ -1,13 +1,37 @@
 import { useState } from "react";
 import { IoMdEye, IoMdClose } from "react-icons/io";
 import { getFormattedPrice } from "../utils/price-formatter.jsx";
+import api from "../utils/api";
+import toast from "react-hot-toast";
 
-export default function AdminOrderDataModel({ order }) {
+export default function AdminOrderDataModel({ order , refresh }) {
 
     const [isOpen, setIsOpen] = useState(false);
 
+    
+    
+
     const firstItem = order?.items?.[0];
 
+    function updateOrderStatus(newStatus) {
+        const token = localStorage.getItem("token");
+
+        api.put("/orders/" + order.orderId , {
+            status: newStatus
+        }, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }    
+        }).then((response) => {
+            console.log(response.data);
+            toast.success("Order status updated successfully");
+            refresh();
+
+        }).catch((error) => {
+            console.log(error);
+            toast.error("Failed to update order status");
+        });
+    }
     return (
         <>
             <IoMdEye
@@ -35,10 +59,20 @@ export default function AdminOrderDataModel({ order }) {
 
                                 <p>
                                     <b>Order ID:</b> {order?.orderId || "N/A"}
+                                    
                                 </p>
 
                                 <p>
-                                    <b>Status:</b> {firstItem?.status || "N/A"}
+                                    <b>Status:</b> 
+                                    <select className="ml-2 p-1 border rounded" value={firstItem?.status || "N/A"}
+                                        onChange={(e) => updateOrderStatus(e.target.value)}
+                                    >
+                                        <option value="N/A" disabled>Select status</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="processing">Processing</option>
+                                        <option value="shipped">Shipped</option>
+                                        <option value="delivered">Delivered</option>
+                                    </select>
                                 </p>
 
                                 <p>
@@ -154,4 +188,5 @@ export default function AdminOrderDataModel({ order }) {
             )}
         </>
     );
+    
 }

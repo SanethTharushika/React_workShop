@@ -410,3 +410,56 @@ export async function getAllOrders(req, res) {
         });
     }
 }
+
+export async function updateOrderStatus(req, res) {
+
+    if (req.user == null || req.user.isAdmin == false) {
+        return res.status(401).json({
+            message: "Unauthorized"
+        });
+    }
+
+    try {
+
+        const order = await Order.findOne({
+            orderId: req.params.orderId
+        });
+
+        if (order == null) {
+            return res.status(404).json({
+                message: "Order not found"
+            });
+        }
+
+        const newStatus = req.body.status;
+
+        if (!newStatus) {
+            return res.status(400).json({
+                message: "Status is required"
+            });
+        }
+
+        await Order.updateOne(
+            {
+                orderId: req.params.orderId
+            },
+            {
+                $set: {
+                    "items.$[].status": newStatus
+                }
+            }
+        );
+
+        return res.status(200).json({
+            message: "Order status updated successfully"
+        });
+
+    } catch (error) {
+
+        console.error("Update order status error:", error);
+
+        return res.status(500).json({
+            message: error.message
+        });
+    }
+}
