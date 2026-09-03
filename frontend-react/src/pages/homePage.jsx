@@ -5,6 +5,7 @@ import ProductsPage from "./productsPage.jsx";
 import OverviewPage from "./overviewPage.jsx";
 import CartPage from "./cartPage.jsx";
 import CheckoutPage from "./checkout.jsx";
+import MyOrders from "./myOrder.jsx";
 
 export default function HomePage() {
     return (
@@ -28,6 +29,8 @@ export default function HomePage() {
                 <Route path="/cart" element={<CartPage/>}/>
 
                 <Route path="/checkout" element={<CheckoutPage/>}/> 
+
+                <Route path="/my-orders" element={<MyOrders/>}/>
 
                 <Route path="/*" element={<h1>404 Not Found</h1>}/>
                 

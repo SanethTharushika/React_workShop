@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../../utils/api";
+import api from "../utils/api";
 import toast from "react-hot-toast";
-import LoadingScreen from "../../components/loadingScreen.jsx";
-import { getFormattedPrice } from "../../utils/price-formatter.jsx";
-import AdminOrderDataModel from "../../components/orderDataModel.jsx";
+import LoadingScreen from "../components/loadingScreen.jsx";
+import { getFormattedPrice } from "../utils/price-formatter.jsx";
+import AdminOrderDataModel from "../components/orderDataModel.jsx";
 
-export default function AdminOrdersPage() {
+export default function MyOrders() {
 
     const [orders, setOrders] = useState([]);
     const [totalOrders, setTotalOrders] = useState(0);
@@ -76,7 +76,7 @@ export default function AdminOrdersPage() {
             <div className="w-full h-[100px] bg-white shadow-2xl mb-10 rounded-lg flex p-4 items-center justify-between">
 
                 <h1 className="text-2xl font-semibold">
-                    All Orders
+                    My Orders
                 </h1>
 
                 <div className="h-full flex items-center">
@@ -161,7 +161,7 @@ export default function AdminOrdersPage() {
                                         <div className="w-full flex justify-center items-center">
 
                                             <AdminOrderDataModel
-                                                isAdmin={true}
+                                                isAdmin={false}
                                                 order={order}
                                                 refresh={() => setRefreshTrigger((value) => value + 1)}
                                             />

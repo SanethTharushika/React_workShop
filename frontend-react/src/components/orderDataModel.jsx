@@ -4,7 +4,7 @@ import { getFormattedPrice } from "../utils/price-formatter.jsx";
 import api from "../utils/api";
 import toast from "react-hot-toast";
 
-export default function AdminOrderDataModel({ order , refresh }) {
+export default function AdminOrderDataModel({ order , refresh , isAdmin}) {
 
     const [isOpen, setIsOpen] = useState(false);
 
@@ -63,16 +63,20 @@ export default function AdminOrderDataModel({ order , refresh }) {
                                 </p>
 
                                 <p>
-                                    <b>Status:</b> 
-                                    <select className="ml-2 p-1 border rounded" value={firstItem?.status || "N/A"}
-                                        onChange={(e) => updateOrderStatus(e.target.value)}
-                                    >
-                                        <option value="N/A" disabled>Select status</option>
-                                        <option value="pending">Pending</option>
-                                        <option value="processing">Processing</option>
-                                        <option value="shipped">Shipped</option>
-                                        <option value="delivered">Delivered</option>
-                                    </select>
+                                    <b>Status:</b>
+                                    {isAdmin ? (
+                                        <select className="ml-2 p-1 border rounded" value={firstItem?.status || "N/A"}
+                                            onChange={(e) => updateOrderStatus(e.target.value)}
+                                        >
+                                            <option value="N/A" disabled>Select status</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="processing">Processing</option>
+                                            <option value="shipped">Shipped</option>
+                                            <option value="delivered">Delivered</option>
+                                        </select>
+                                    ) : (
+                                        <span>{firstItem?.status || "N/A"}</span>
+                                    )}
                                 </p>
 
                                 <p>
