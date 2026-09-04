@@ -88,6 +88,10 @@ export default function UserData() {
 
                                 if (value === "my-orders") {
 
+                                    toast.success(
+                                        "My Orders selected"
+                                    );
+
                                     navigate("/my-orders");
                                 }
 
