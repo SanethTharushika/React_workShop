@@ -54,7 +54,7 @@ export default function AdminProductPage() {
             }
 
         
-            <div className="w-full h-[100px] bg-white shadow-2xl mb-10 rounded-lg flex p-4 items-center justify-between">
+            <div className="w-full h-[100px] bg-gray-300 shadow-2xl mb-10 rounded-lg flex p-4 items-center justify-between">
 
                 <h1 className="text-2xl font-semibold">All Product</h1>
 
