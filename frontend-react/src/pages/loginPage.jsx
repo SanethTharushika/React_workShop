@@ -1,7 +1,7 @@
 import { MdEmail, MdPassword } from "react-icons/md";
 import { FaGoogle } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import api from "../utils/api.js";
 
@@ -11,21 +11,7 @@ export default function LoginPage() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
 
-    // Popup animation
-    const [showCard, setShowCard] = useState(false);
-
     const navigate = useNavigate();
-
-    useEffect(() => {
-
-        const timer = setTimeout(() => {
-            setShowCard(true);
-        }, 100);
-
-        return () => clearTimeout(timer);
-
-    }, []);
-
 
     async function handleLogin() {
 
@@ -64,37 +50,11 @@ export default function LoginPage() {
         setLoading(false);
     }
 
-
     return (
 
         <div className="w-full min-h-screen bg-[url('/login-bg.jpg')] bg-cover bg-no-repeat flex justify-center items-center">
 
-            <div
-                className={`
-                    w-[400px]
-                    min-h-[500px]
-                    backdrop-blur-md
-                    bg-black/25
-                    shadow-2xl
-                    shadow-white/30
-                    rounded-2xl
-                    flex
-                    flex-col
-                    p-6
-                    border
-                    border-white/20
-
-                    transition-all
-                    duration-500
-                    ease-out
-
-                    ${
-                        showCard
-                            ? "opacity-100 scale-100 translate-y-0"
-                            : "opacity-0 scale-75 translate-y-12"
-                    }
-                `}
-            >
+            <div className="w-[400px] min-h-[500px] backdrop-blur-md bg-black/25 shadow-2xl shadow-white/30 rounded-2xl flex flex-col p-6 border border-white/20">
 
                 <h1 className="text-4xl text-center font-bold text-white my-5">
                     Login
@@ -129,10 +89,24 @@ export default function LoginPage() {
                             placeholder:text-gray-300
                             mb-3
                             outline-none
-                            transition
+
+                            transition-all
+                            duration-300
+                            ease-out
+
+                            hover:scale-[1.03]
+                            hover:border-[#18c3cd]
+                            hover:bg-black/30
+                            hover:shadow-xl
+                            hover:shadow-cyan-400/30
+
+                            focus:scale-[1.03]
                             focus:border-[#18c3cd]
+                            focus:bg-black/30
                             focus:ring-2
                             focus:ring-[#18c3cd]/30
+                            focus:shadow-xl
+                            focus:shadow-cyan-400/30
                         "
                     />
 
@@ -167,10 +141,24 @@ export default function LoginPage() {
                             placeholder:text-gray-300
                             mb-3
                             outline-none
-                            transition
+
+                            transition-all
+                            duration-300
+                            ease-out
+
+                            hover:scale-[1.03]
+                            hover:border-[#18c3cd]
+                            hover:bg-black/30
+                            hover:shadow-xl
+                            hover:shadow-cyan-400/30
+
+                            focus:scale-[1.03]
                             focus:border-[#18c3cd]
+                            focus:bg-black/30
                             focus:ring-2
                             focus:ring-[#18c3cd]/30
+                            focus:shadow-xl
+                            focus:shadow-cyan-400/30
                         "
                     />
 
@@ -193,7 +181,7 @@ export default function LoginPage() {
                 </p>
 
 
-                {/* Sign In */}
+                {/* Sign In Button */}
 
                 <button
                     disabled={loading}
@@ -208,10 +196,18 @@ export default function LoginPage() {
                         mt-5
                         border
                         border-white/40
-                        transition
+
+                        transition-all
+                        duration-300
+                        ease-out
+
+                        hover:scale-[1.04]
                         hover:bg-[#13aab3]
-                        hover:scale-[1.02]
-                        active:scale-[0.98]
+                        hover:shadow-xl
+                        hover:shadow-cyan-400/40
+
+                        active:scale-[0.97]
+
                         disabled:opacity-60
                         disabled:cursor-not-allowed
                     "
@@ -257,7 +253,7 @@ export default function LoginPage() {
                 </div>
 
 
-                {/* Google */}
+                {/* Google Button */}
 
                 <button
                     className="
@@ -272,10 +268,17 @@ export default function LoginPage() {
                         gap-2
                         border
                         border-white/40
-                        transition
+
+                        transition-all
+                        duration-300
+                        ease-out
+
+                        hover:scale-[1.04]
                         hover:bg-[#13aab3]
-                        hover:scale-[1.02]
-                        active:scale-[0.98]
+                        hover:shadow-xl
+                        hover:shadow-cyan-400/40
+
+                        active:scale-[0.97]
                     "
                 >
 
