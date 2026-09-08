@@ -35,7 +35,7 @@ export default function OverviewPage() {
     
 
     return (
-        <div className="w-full h-full flex justify-center items-center">
+        <div className="w-full h-auto lg:h-full bg-primary flex  flex flex-col lg:flex-row  justify-center items-center pt-6 lg:pt-0">
             {
                 product == null && <LoadingScreen/>
             }
@@ -43,13 +43,13 @@ export default function OverviewPage() {
             {
                 product != null && <>
 
-                    <div className="w-1/2  h-full flex justify-center items-center">
+                    <div className="w-full lg:w-1/2 h-full flex justify-center items-center">
 
                         <ProductImageSlideShow images={product.image}/>
                     
                     </div>
 
-                    <div className="w-1/2  h-full flex flex-col p-6 ">
+                    <div className="w-full lg:w-1/2  h-full flex flex-col p-6 ">
                     <span className="text-gray-500 text-sm italic mb-4">Product ID: {product.productId}</span>
                     <p className="text-gray-500 text-sm italic mb-4">{product.brand+ " " + product.model}</p>
 
