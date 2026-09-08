@@ -4,32 +4,41 @@ import { FaDocker } from "react-icons/fa";
 import uploadMedia from '../utils/mediaUpload';
 
 
-
-export default function TestPage() {
-
-    const [file, setFile] = useState(null);
-
-    async function uploadFile() {
-
-        const respose = await uploadMedia(file)
-        console.log(respose);
-    }
-
-
+ 
+export default function TestPage() {    
     return (
-        <div className="w-min-full min-h-screen bg-white flex justify-center items-center">
-            <input type="file" onChange={
-                (e) => {
-                    setFile(e.target.files[0]);
-                }
-            } />
-            <button
-                className="w-24 h-12 bg-blue-500 text-white rounded-lg mx-5" onClick={uploadFile}>
-                upload
-            </button>
+        <div className="w-min-full min-h-screen bg-green-500 md:bg-red-600 lg:bg-blue-600">
+
         </div>
+
     )
 }
+
+// export default function TestPage() {
+
+//     const [file, setFile] = useState(null);
+
+//     async function uploadFile() {
+
+//         const respose = await uploadMedia(file)
+//         console.log(respose);
+//     }
+
+
+//     return (
+//         <div className="w-min-full min-h-screen bg-white flex justify-center items-center">
+//             <input type="file" onChange={
+//                 (e) => {
+//                     setFile(e.target.files[0]);
+//                 }
+//             } />
+//             <button
+//                 className="w-24 h-12 bg-blue-500 text-white rounded-lg mx-5" onClick={uploadFile}>
+//                 upload
+//             </button>
+//         </div>
+//     )
+// }
 
 
 
