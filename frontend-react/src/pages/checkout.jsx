@@ -13,12 +13,12 @@ export default function CheckoutPage() {
 
 
     return (
-        <div className="w-full h-full overflow-y-scroll flex items-center flex-col">
+        <div className="w-full h-auto lg:h-full overflow-y-scroll flex items-center flex-col">
             {
                 cart.map(
                     (cartItem, index) => {
                         return (
-                            <div className="w-[600px] h-[150px] shadow-2xl my-4 flex flex-row relative" key={index}>
+                            <div className="w-[400px] lg:w-[600px] h-[250px] lg:h-[150px] shadow-2xl my-4 flex flex-row relative" key={index}>
                                 <img src={cartItem.product.image} className="h-full aspect-square object-cover" />
 
                                 <div className="h-full w-[450px] flex flex-col   p-4">
@@ -70,11 +70,11 @@ export default function CheckoutPage() {
                 )
             }
 
-            <div className="w-[600px] h-[150px] shadow-2xl bg-white my-4 flex flex-row justify-between items-center p-4 sticky bottom-0">
+            <div className="w-[400px] lg:w-[600px] h-[150px] shadow-2xl bg-white my-4 flex flex-row justify-between items-center p-4 sticky bottom-0">
                 <CreateOrder cart={cart} />
                 <div className="flex justify-end h-full items-center">
-                    <span className="text-gray-500 text-lg mr-4">Total:</span>
-                    <span className="text-accent text-2xl font-semibold">
+                    <span className="text-gray-500 text-lg mr-4 hidden lg:block">Total:</span>
+                    <span className="text-accent lg:text-2xl font-semibold">
                         {getFormattedPrice(getTotal(cart))}
                     </span>
                 </div>
