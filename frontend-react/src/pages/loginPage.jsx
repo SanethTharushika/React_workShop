@@ -13,7 +13,13 @@ export default function LoginPage() {
 
     const navigate = useNavigate();
 
-    async function handleLogin() {
+    async function handleLogin(event) {
+
+        event.preventDefault();
+
+        if (loading) {
+            return;
+        }
 
         setLoading(true);
 
@@ -45,16 +51,19 @@ export default function LoginPage() {
                 "Login failed"
             );
 
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     }
 
     return (
 
         <div className="w-full min-h-screen bg-[url('/login-bg.jpg')] bg-cover bg-no-repeat flex justify-center items-center">
 
-            <div className="w-[400px] min-h-[500px] backdrop-blur-md bg-black/25 shadow-2xl shadow-white/30 rounded-2xl flex flex-col p-6 border border-white/20">
+            <form
+                onSubmit={handleLogin}
+                className="w-[400px] min-h-[500px] backdrop-blur-md bg-black/25 shadow-2xl shadow-white/30 rounded-2xl flex flex-col p-6 border border-white/20"
+            >
 
                 <h1 className="text-4xl text-center font-bold text-white my-5">
                     Login
@@ -184,8 +193,8 @@ export default function LoginPage() {
                 {/* Sign In Button */}
 
                 <button
+                    type="submit"
                     disabled={loading}
-                    onClick={handleLogin}
                     className="
                         w-full
                         h-[45px]
@@ -288,7 +297,7 @@ export default function LoginPage() {
 
                 </button>
 
-            </div>
+            </form>
 
         </div>
     );
