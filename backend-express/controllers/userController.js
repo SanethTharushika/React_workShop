@@ -118,3 +118,49 @@ export async function getUser(req, res) {
         res.json({ message: error.message });
     } 
 }
+
+export async function updatePassword(req, res) {
+    if(req.user == null) {
+        res.status(401).json({ message: "Unauthorized access..." });
+        return;
+    }
+
+    const password = req.body.password;
+
+    const passwordHash = bcrypt.hashSync(password, 10);
+
+    try {
+
+        const email = req.user.email;
+        await User.updateOne({ email: email }, { password : passwordHash });
+        res.json({ message: "Password updated successfully..." });
+
+    }catch (error) {
+        res.json({ message: error.message });
+    }
+}
+
+export async function updateProfile(req, res) {
+
+    if(req.user == null) {
+        res.status(401).json({ message: "Unauthorized access..." });
+        return;
+    }
+
+    try {
+
+        const email = req.user.email;
+
+        await User.updateOne({ email: email }, {
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            image: req.body.image
+        });
+
+        res.json({ message: "Profile updated successfully..." });
+
+    }catch (error) {
+        res.json({ message: error.message });
+    }
+
+}
