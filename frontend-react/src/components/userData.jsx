@@ -40,7 +40,7 @@ export default function UserData() {
             {
                 user == null ? (
 
-                    <div>
+                    <div className="lg:flex">
                         <Link
                             to="/signin"
                             className="text-white hidden lg:block hover:text-gray-300"

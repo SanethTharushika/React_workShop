@@ -6,9 +6,51 @@ import AdminProductPage from "./admin/adminProductPage";
 import AdminAddProductForm from "./admin/adminAddProductForm";
 import AdminEditProductForm from "./admin/adminEditProductForm";
 import AdminOrdersPage from "./admin/adminOrdersPage";
+import { useState, useEffect } from "react";
+import api from "../utils/api.js";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import LoadingScreen from "../components/loadingScreen.jsx";
 
 
 export default function AdminPage() {
+
+    const [user, setUser] = useState(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+
+        const token = localStorage.getItem("token");
+
+        if (token != null) {
+
+            api.get("/users/me", {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+                .then((response) => {
+                    if (response.data.isAdmin) {
+                        setUser(response.data);
+                    } else {
+                        toast.error("You are not authorized to access this page.");
+                        navigate("/login");
+
+                    }
+                })
+                .catch((error) => {
+                    console.error("Failed to load user data:", error);
+                    setUser(null);
+                });
+
+        } else {
+            toast.error("You are not authorized to access this page.");
+            navigate("/login");
+
+        }
+
+    }, []);
+
     return (
         <div className="w-full min-h-screen bg-primary flex">
 
@@ -21,17 +63,17 @@ export default function AdminPage() {
                 </div>
 
                 <Link to="/admin" className="w-full m-5 text-xl text-gray-500 flex  justify-center items-center gap-2">
-                    <FiShoppingCart/>
+                    <FiShoppingCart />
                     <span className="w-full h-full block ">Orders</span>
                 </Link>
 
                 <Link to="/admin/products" className="w-full m-5 text-xl text-gray-500 flex  justify-center items-center gap-2">
-                    <BsGift/>
+                    <BsGift />
                     <span className="w-full h-full block ">Products</span>
                 </Link>
 
                 <Link to="/admin/users" className="w-full m-5 text-xl text-gray-500 flex  justify-center items-center gap-2">
-                    <FaRegUser/>
+                    <FaRegUser />
                     <span className="w-full h-full block ">Users</span>
                 </Link>
 
@@ -40,13 +82,14 @@ export default function AdminPage() {
 
             <div className="w-[calc(100%-300px)] min-h-screen p-4 flex">
 
-                <Routes>
-                    <Route index element={<AdminOrdersPage/>} />
-                    <Route path="products" element={<AdminProductPage/>} />
-                    <Route path="users" element={<h1>Users-page</h1>} />
-                    <Route path="add-product" element={<AdminAddProductForm/>} />
-                    <Route path="edit-product" element={<AdminEditProductForm/>} />
-                </Routes>
+                {user == null ? <LoadingScreen /> :
+                    <Routes>
+                        <Route index element={<AdminOrdersPage />} />
+                        <Route path="products" element={<AdminProductPage />} />
+                        <Route path="users" element={<h1>Users-page</h1>} />
+                        <Route path="add-product" element={<AdminAddProductForm />} />
+                        <Route path="edit-product" element={<AdminEditProductForm />} />
+                    </Routes>}
 
             </div>
 
