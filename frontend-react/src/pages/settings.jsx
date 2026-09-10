@@ -82,35 +82,35 @@ export default function Settings() {
 
     }
 
-    // async function handleUpdatePassword() {
+    async function handleUpdatePassword() {
 
-    //     if (password !== confirmPassword) {
-    //         toast.error("Passwords do not match.");
-    //         return;
-    //     }
-    //     setLoading(true);
+        if (password !== confirmPassword) {
+            toast.error("Passwords do not match.");
+            return;
+        }
+        setLoading(true);
 
-    //     try {
-    //         const token = localStorage.getItem("token");
-    //         await api.post("/users/password", {
-    //             password: password
-    //         }, {
-    //             headers: {
-    //                 Authorization: `Bearer ${token}`
-    //             }
-    //         })
-    //         setLoading(false);
-    //         toast.success("Password updated successfully.");
-    //         window.location.reload();
+        try {
+            const token = localStorage.getItem("token");
+            await api.post("/users/password", {
+                password: password
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            setLoading(false);
+            toast.success("Password updated successfully.");
+            window.location.reload();
 
-    //     } catch (error) {
-    //         console.error("Failed to update password:", error);
-    //         toast.error("Failed to update password. Please try again.");
-    //         setLoading(false);
-    //     }
+        } catch (error) {
+            console.error("Failed to update password:", error);
+            toast.error("Failed to update password. Please try again.");
+            setLoading(false);
+        }
 
 
-    // }
+    }
 
     return (
         <div className="w-full h-full overflow-y-scroll pb-20 flex flex-col lg:flex-row justify-center items-center gap-4" >
@@ -150,7 +150,7 @@ export default function Settings() {
             </div>
 
 
-            {/* <div className="w-[400px] p-4 h-[400px] bg-white shadow-2xl rounded-lg" >
+            <div className="w-[400px] p-4 h-[400px] bg-white shadow-2xl rounded-lg" >
                 <h1 className="font-semibold text-2xl mb-4">Change Password</h1>
                 <lable className="text-sm font-medium">New Password</lable>
                 <input type="password" className="w-full h-[40px] border border-gray-300 rounded-md px-2 mb-4" value={password}
@@ -174,7 +174,7 @@ export default function Settings() {
                     Update Password
                 </button>
 
-            </div> */}
+            </div>
             {
                 loading && <LoadingScreen />
             }
