@@ -176,30 +176,37 @@ export default function Settings() {
 
             </div>
 
-            <div className="w-[400px] p-4 h-[400px] bg-white shadow-2xl rounded-lg" >
-                <h1 className="font-semibold text-2xl mb-4">Change Password</h1>
-                <lable className="text-sm font-medium">New Password</lable>
-                <input type="password" className="w-full h-[40px] border border-gray-300 rounded-md px-2 mb-4" value={password}
-                    onChange={
-                        (e) => {
-                            setPassword(e.target.value)
-                        }
-                    } />
+            <div className="w-[400px] p-4 h-[400px] bg-white shadow-2xl rounded-xl border border-gray-100 transition-all duration-300 ease-out hover:shadow-accent/20">
+                <h1 className="font-semibold text-2xl mb-4 text-gray-800">Change Password</h1>
 
-                <lable className="text-sm font-medium">Confirm Password</lable>
-                <input type="password" className="w-full h-[40px] border border-gray-300 rounded-md px-2 mb-4" value={confirmPassword}
-                    onChange={
-                        (e) => {
-                            setConfirmPassword(e.target.value)
-                        }
-                    } />
+                <label className="text-sm font-medium text-gray-700">New Password</label>
 
-                <button className="w-full p-4 h-[40px] bg-accent text-white font-semibold rounded-md hover:bg-accent/80 shadow-2xl flex items-center justify-center"
+                <input
+                    type="password"
+                    className="w-full h-[40px] border border-gray-300 rounded-md px-2 mb-4 outline-none transition-all duration-300 ease-out hover:scale-[1.03] hover:border-accent hover:shadow-lg hover:shadow-accent/20 focus:scale-[1.03] focus:border-accent focus:ring-2 focus:ring-accent/20 focus:shadow-lg focus:shadow-accent/20"
+                    value={password}
+                    onChange={(e) => {
+                        setPassword(e.target.value);
+                    }}
+                />
+
+                <label className="text-sm font-medium text-gray-700">Confirm Password</label>
+
+                <input
+                    type="password"
+                    className="w-full h-[40px] border border-gray-300 rounded-md px-2 mb-4 outline-none transition-all duration-300 ease-out hover:scale-[1.03] hover:border-accent hover:shadow-lg hover:shadow-accent/20 focus:scale-[1.03] focus:border-accent focus:ring-2 focus:ring-accent/20 focus:shadow-lg focus:shadow-accent/20"
+                    value={confirmPassword}
+                    onChange={(e) => {
+                        setConfirmPassword(e.target.value);
+                    }}
+                />
+
+                <button
+                    className="w-full p-4 h-[40px] bg-accent text-white font-semibold rounded-md hover:bg-accent/80 shadow-2xl flex items-center justify-center transition-all duration-300 ease-out hover:scale-[1.04] hover:shadow-xl hover:shadow-accent/30 active:scale-[0.97]"
                     onClick={handleUpdatePassword}
                 >
                     Update Password
                 </button>
-
             </div>
             {
                 loading && <LoadingScreen />
