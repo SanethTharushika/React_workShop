@@ -113,11 +113,11 @@ export default function Settings() {
     }
 
     return (
-        <div className="w-full h-full overflow-y-scroll pb-20 flex flex-col lg:flex-row justify-center items-center gap-4" >
+        <div className="w-full h-full overflow-y-scroll pb-20 flex flex-col lg:flex-row justify-center items-center gap-4 " >
             <div className="w-[400px] p-5 h-[400px] bg-white shadow-2xl rounded-xl flex flex-col border border-gray-100 transition-all duration-300 ease-out hover:shadow-accent/20">
 
                 <h1 className="font-semibold text-2xl mb-5 text-gray-800">
-                    Profile Information
+                    👤Profile Information 
                 </h1>
 
                 {/* First Name */}
@@ -177,7 +177,7 @@ export default function Settings() {
             </div>
 
             <div className="w-[400px] p-4 h-[400px] bg-white shadow-2xl rounded-xl border border-gray-100 transition-all duration-300 ease-out hover:shadow-accent/20">
-                <h1 className="font-semibold text-2xl mb-4 text-gray-800">Change Password</h1>
+                <h1 className="font-semibold text-2xl mb-4 text-gray-800">🔑Change Password</h1>
 
                 <label className="text-sm font-medium text-gray-700">New Password</label>
 
