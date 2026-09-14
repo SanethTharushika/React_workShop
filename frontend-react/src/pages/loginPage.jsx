@@ -11,10 +11,26 @@ export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate(); 
     const googlelogin = useGoogleLogin(
         {
             onSuccess: (response) => {
                 console.log(response);
+
+                api.post("/users/google-login", {
+                    accessToken: response.access_token
+                }).then((res) => {
+                    console.log(res.data);
+                    localStorage.setItem("token", res.data.token);
+                    if (res.data.isAdmin) {
+                        navigate("/admin");
+                    } else {
+                        navigate("/");
+                    }
+
+                }).catch((err) => {
+                    console.log(err);
+                })
             },
             onError: (error) => {
             console.log(error);
@@ -23,7 +39,7 @@ export default function LoginPage() {
 
     )
 
-    const navigate = useNavigate();
+    
 
     async function handleLogin(event) {
 

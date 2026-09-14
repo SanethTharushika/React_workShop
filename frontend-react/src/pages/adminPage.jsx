@@ -34,7 +34,7 @@ export default function AdminPage() {
                         setUser(response.data);
                     } else {
                         toast.error("You are not authorized to access this page.");
-                        navigate("/login");
+                        navigate("/");
 
                     }
                 })
