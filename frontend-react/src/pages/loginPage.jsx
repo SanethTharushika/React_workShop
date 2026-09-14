@@ -4,12 +4,24 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import api from "../utils/api.js";
+import { useGoogleLogin } from "@react-oauth/google";
 
 export default function LoginPage() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const googlelogin = useGoogleLogin(
+        {
+            onSuccess: (response) => {
+                console.log(response);
+            },
+            onError: (error) => {
+            console.log(error);
+            }  
+        } 
+
+    )
 
     const navigate = useNavigate();
 
@@ -264,7 +276,7 @@ export default function LoginPage() {
 
                 {/* Google Button */}
 
-                <button
+                <button onClick={() => googlelogin()}
                     className="
                         w-full
                         h-[45px]
