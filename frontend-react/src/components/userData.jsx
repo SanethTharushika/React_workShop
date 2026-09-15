@@ -53,7 +53,7 @@ export default function UserData() {
                         </span>
 
                         <Link
-                            to="/register"
+                            to="/signup"
                             className="text-white hidden lg:block hover:text-gray-300"
                         >
                             Register
