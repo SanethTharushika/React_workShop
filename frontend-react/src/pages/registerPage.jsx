@@ -46,12 +46,12 @@ export default function RegisterPage() {
 
     async function handleRegister(event) {
 
-        event.preventDefault();
-
-        if (loading) {
+        if (password !== confirmPassword) {
+            toast.error("Passwords do not match");
             return;
         }
 
+        
         setLoading(true);
 
         try {
