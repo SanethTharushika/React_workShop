@@ -150,7 +150,35 @@ export default function RegisterPage() {
                     <div className="w-1/2">
 
                         <label className="text-white text-lg flex items-center gap-2 mb-1">First Name</label>
-                        <input className="w-full h-[40px] rounded-md px-2 border border-white text-white" type="text" placeholder="Saneth"
+                        <input className="w-full
+                            h-[45px]
+                            rounded-lg
+                            px-3
+                            border
+                            border-white/70
+                            bg-black/20
+                            text-white
+                            placeholder:text-gray-300
+                            mb-3
+                            outline-none
+
+                            transition-all
+                            duration-300
+                            ease-out
+
+                            hover:scale-[1.03]
+                            hover:border-[#18c3cd]
+                            hover:bg-black/30
+                            hover:shadow-xl
+                            hover:shadow-cyan-400/30
+
+                            focus:scale-[1.03]
+                            focus:border-[#18c3cd]
+                            focus:bg-black/30
+                            focus:ring-2
+                            focus:ring-[#18c3cd]/30
+                            focus:shadow-xl
+                            focus:shadow-cyan-400/30" type="text" placeholder="Saneth"
                             onChange={
                                 (e) => {
                                     setFirstName(e.target.value);
@@ -166,7 +194,35 @@ export default function RegisterPage() {
                     <div className="w-1/2">
 
                         <label className="text-white text-lg flex items-center gap-2 mb-1">Last Name</label>
-                        <input className="w-full h-[40px] rounded-md px-2 border border-white text-white" type="text"  placeholder="Siriwardhana"
+                        <input className="w-full
+                            h-[45px]
+                            rounded-lg
+                            px-3
+                            border
+                            border-white/70
+                            bg-black/20
+                            text-white
+                            placeholder:text-gray-300
+                            mb-3
+                            outline-none
+
+                            transition-all
+                            duration-300
+                            ease-out
+
+                            hover:scale-[1.03]
+                            hover:border-[#18c3cd]
+                            hover:bg-black/30
+                            hover:shadow-xl
+                            hover:shadow-cyan-400/30
+
+                            focus:scale-[1.03]
+                            focus:border-[#18c3cd]
+                            focus:bg-black/30
+                            focus:ring-2
+                            focus:ring-[#18c3cd]/30
+                            focus:shadow-xl
+                            focus:shadow-cyan-400/30"  placeholder="Siriwardhana"
                             onChange={
                                 (e) => {
                                     setLastName(e.target.value);
