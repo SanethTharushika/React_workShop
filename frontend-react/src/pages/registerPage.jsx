@@ -96,54 +96,7 @@ export default function RegisterPage() {
 
                 {/* Email */}
 
-                <div className="w-full">
-
-                    <label className="text-white text-lg flex items-center gap-2 mb-1">
-                        <MdEmail />
-                        Email
-                    </label>
-
-                    <input
-                        type="email"
-                        value={email}
-                        placeholder="user@example.com"
-                        onChange={(e) => {
-                            setEmail(e.target.value);
-                        }}
-                        className="
-                            w-full
-                            h-[45px]
-                            rounded-lg
-                            px-3
-                            border
-                            border-white/70
-                            bg-black/20
-                            text-white
-                            placeholder:text-gray-300
-                            mb-3
-                            outline-none
-
-                            transition-all
-                            duration-300
-                            ease-out
-
-                            hover:scale-[1.03]
-                            hover:border-[#18c3cd]
-                            hover:bg-black/30
-                            hover:shadow-xl
-                            hover:shadow-cyan-400/30
-
-                            focus:scale-[1.03]
-                            focus:border-[#18c3cd]
-                            focus:bg-black/30
-                            focus:ring-2
-                            focus:ring-[#18c3cd]/30
-                            focus:shadow-xl
-                            focus:shadow-cyan-400/30
-                        "
-                    />
-
-                </div>
+                
 
                 <div className="w-full mt-5 flex flex-row gap-2">
 
@@ -232,6 +185,55 @@ export default function RegisterPage() {
                             ></input>
 
                     </div>
+
+                </div>
+
+                <div className="w-full">
+
+                    <label className="text-white text-lg flex items-center gap-2 mb-1">
+                        <MdEmail />
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        value={email}
+                        placeholder="user@example.com"
+                        onChange={(e) => {
+                            setEmail(e.target.value);
+                        }}
+                        className="
+                            w-full
+                            h-[45px]
+                            rounded-lg
+                            px-3
+                            border
+                            border-white/70
+                            bg-black/20
+                            text-white
+                            placeholder:text-gray-300
+                            mb-3
+                            outline-none
+
+                            transition-all
+                            duration-300
+                            ease-out
+
+                            hover:scale-[1.03]
+                            hover:border-[#18c3cd]
+                            hover:bg-black/30
+                            hover:shadow-xl
+                            hover:shadow-cyan-400/30
+
+                            focus:scale-[1.03]
+                            focus:border-[#18c3cd]
+                            focus:bg-black/30
+                            focus:ring-2
+                            focus:ring-[#18c3cd]/30
+                            focus:shadow-xl
+                            focus:shadow-cyan-400/30
+                        "
+                    />
 
                 </div>
 
