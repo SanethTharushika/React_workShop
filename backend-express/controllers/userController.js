@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import axios from "axios";
+import OTP from "../models/otp.js";
 
 dotenv.config();
 
@@ -236,5 +237,48 @@ export async function googleLogin(req, res) {
     } catch (error) {
         console.error(error);
     }
+
+}
+
+export async function sendOTP(req, res) {
+
+    try {
+
+        const email = req.body.email;
+
+        const user = await User.findOne({ email: email });
+
+        if(user == null) {
+            res.status(404).json({ message: "User not found..." });
+            return;
+        }
+
+        if(user.isBlocked) {
+            res.status(403).json({ message: "User is blocked..." });
+            return;
+        }
+
+        await OTP.deleteOne({ email: email });
+
+        //otp between 100000 and 999999
+        const otpNumber = Math.floor(100000 + Math.random() * 900000);
+        
+        //save otp in database
+        const otpHash = bcrypt.hashSync(otpNumber.toString(), 10);
+
+        const newOTP = new OTP({
+            email: email,
+            otp: otpHash
+        });
+
+        await newOTP.save();
+
+
+
+    
+    }catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+
 
 }
