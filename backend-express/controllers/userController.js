@@ -4,9 +4,20 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import axios from "axios";
 import OTP from "../models/otp.js";
+import nodemailer from "nodemailer";
 
 dotenv.config();
 
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+        user: process.env.EMAIL,
+        pass: process.env.APP_PASSWORD
+    }
+});
 
 export async function createUser(req , res) {
     try {
@@ -271,7 +282,7 @@ export async function sendOTP(req, res) {
             otp: otpHash
         });
 
-        await newOTP.save();
+        await newOTP.save(); 
 
 
 
