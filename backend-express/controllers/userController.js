@@ -284,6 +284,18 @@ export async function sendOTP(req, res) {
 
         await newOTP.save(); 
 
+        //send otp to user email
+        const message = {
+            from: process.env.EMAIL,
+            to: email,
+            subject: "OTP for password reset",
+            text: `Your OTP for password reset is ${otpNumber}. It is valid for 10 minutes.`
+        };
+
+        await transporter.sendMail(message); 
+
+        res.json({ message: "OTP sent to your email successfully." });
+
 
 
     
