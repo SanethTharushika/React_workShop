@@ -2,6 +2,7 @@ import { useState } from "react";
 import api from "../utils/api";
 import { toast } from "react-hot-toast";
 import LoadingScreen from "../components/LoadingScreen";
+import { useNavigate } from "react-router-dom";
 
 
 export default function ForgetPasswordPage() {
@@ -12,9 +13,28 @@ export default function ForgetPasswordPage() {
     const [otp, setOtp] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const navigate = useNavigate();
 
 
     function verifyOTP() {
+
+        if (newPassword !== confirmPassword) {
+            toast.error("Passwords do not match");
+            return;
+        }
+
+        setLoading(true);
+
+        api.post("/users/verify-otp", { email: email, otp: otp, newPassword: newPassword }).then((res) => {
+            toast.success("Password changed successfully");
+            navigate("/signin");
+
+        }).catch((err) => {
+            console.log(err);
+            toast.error(err?.response?.data?.message || "OTP verification failed");
+            setLoading(false);
+        }
+        )
 
     }
     
