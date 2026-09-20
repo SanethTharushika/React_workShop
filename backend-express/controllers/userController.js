@@ -305,3 +305,49 @@ export async function sendOTP(req, res) {
 
 
 }
+
+export async function verifyOTP(req, res) {
+
+    try {
+
+        const email = req.body.email;
+        const otp = req.body.otp;
+        const newPassword = req.body.newPassword;
+
+        const otpRecord = await OTP.findOne({ email: email }); 
+
+        if(otpRecord == null) {
+            res.status(404).json({ message: "OTP not found. Please request a new OTP." });
+            return;
+        }
+
+        const currentTime = new Date();
+        const otpTime = new Date(otpRecord.time);
+
+        const timeDiff = (currentTime - otpTime) / (1000 * 60); // in minutes
+
+        if(timeDiff > 10) {
+            res.status(400).json({ message: "OTP has expired. Please request a new OTP." });
+            return;
+        }
+
+        const isOTPValid = bcrypt.compareSync(otp, otpRecord.otp);
+
+        if(!isOTPValid) {
+            res.status(400).json({ message: "Invalid OTP. Please try again." });
+            return;
+        }
+
+        const passwordHash = bcrypt.hashSync(newPassword, 10);
+
+        await User.updateOne({ email: email }, { password: passwordHash });
+
+        await OTP.deleteOne({ email: email });
+
+        res.json({ message: "Password updated successfully." });
+
+
+    }catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
