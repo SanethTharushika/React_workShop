@@ -6,6 +6,7 @@ import { updateProfile } from '../controllers/userController.js';
 import { updatePassword } from '../controllers/userController.js';
 import { googleLogin } from '../controllers/userController.js';
 import { sendOTP } from '../controllers/userController.js';
+import { verifyOTP } from '../controllers/userController.js';
 
 const userRouter = express.Router();
 
@@ -16,5 +17,6 @@ userRouter.put("/", updateProfile);
 userRouter.post("/password" , updatePassword);
 userRouter.post("/google-login", googleLogin);
 userRouter.post("/otp", sendOTP);
+userRouter.post("/verify-otp", verifyOTP);
 
 export default userRouter;
