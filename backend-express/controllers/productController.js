@@ -110,3 +110,26 @@ export async function getProductById(req, res) {
         res.status(500).json({ message: "Error fetching product.", error });
     }
 }
+
+
+export async function searchProducts(req, res) {
+
+    try {
+
+        const query = req.params.query;
+
+        const products = await Product.find(
+            {
+                name : { $regex: query, $options: "i" },
+            }
+            
+        )
+
+        res.json(products);
+           
+
+    }catch (error) {
+        res.status(500).json({ message: "Error searching products.", error });
+    }
+
+}
