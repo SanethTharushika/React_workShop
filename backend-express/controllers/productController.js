@@ -120,7 +120,13 @@ export async function searchProducts(req, res) {
 
         const products = await Product.find(
             {
-                name : { $regex: query, $options: "i" },
+                $or: [
+                    { name: { $regex: query, $options: "i" } },
+                    { description: { $regex: query, $options: "i" } },
+                    { altNames: {$elemMatch: { $regex: query, $options: "i" }} }
+                ],
+
+                isAvailable: true
             }
             
         )
