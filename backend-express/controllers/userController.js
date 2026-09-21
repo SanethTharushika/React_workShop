@@ -351,3 +351,42 @@ export async function verifyOTP(req, res) {
         res.status(500).json({ message: error.message });
     }
 }
+
+export async function getAllUsers(req, res) {
+
+    if(req.user != null && req.user.isAdmin) {
+        res.status(401).json({ message: "Access denied. Only administrators can view all users." });
+        return;
+    }
+
+    try {
+        
+        const pageSizeInString = req.params.pageSize||"10";
+
+        const pageNumberInString = req.params.pageNumber||"1";
+
+        const pageSize = parseInt(pageSizeInString);
+
+        const pageNumber = parseInt(pageNumberInString);
+
+        const userCount = await User.countDocuments();
+
+        const totalPages = Math.ceil(userCount / pageSize);
+
+        const users = await User.find().skip((pageNumber - 1) * pageSize).limit(pageSize);
+
+        res.json({ 
+            users: users, 
+            totalPages: totalPages, 
+            currentPage: pageNumber
+        });
+
+
+
+
+
+    }catch (error) {
+        res.status(500).json({ message: "Error fetching users.", error });
+    }
+
+}

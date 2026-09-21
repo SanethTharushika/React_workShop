@@ -7,12 +7,14 @@ import { updatePassword } from '../controllers/userController.js';
 import { googleLogin } from '../controllers/userController.js';
 import { sendOTP } from '../controllers/userController.js';
 import { verifyOTP } from '../controllers/userController.js';
+import { getAllUsers } from '../controllers/userController.js';
 
 const userRouter = express.Router();
 
 userRouter.post("/", createUser);
 userRouter.post("/login", loginUser);
 userRouter.get("/me", getUser);
+userRouter.get("/all", getAllUsers);
 userRouter.put("/", updateProfile);
 userRouter.post("/password" , updatePassword);
 userRouter.post("/google-login", googleLogin);
