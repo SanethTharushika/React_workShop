@@ -10,8 +10,10 @@ export default function ProductsPage() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [query, setQuery] = useState("");
+    const [searching, setSearching] = useState(false);
 
-    useEffect(() => {
+    function loadProducts() {
+        setLoading(true);
         api.get("/products")
             .then((response) => {
                 setProducts(response.data);
@@ -22,10 +24,25 @@ export default function ProductsPage() {
             .finally(() => {
                 setLoading(false);
             });
+    }
+
+    useEffect(() => {
+        loadProducts();
     }, []);
 
     function searchProducts() {
-        setLoading(true);
+
+        setSearching(true);
+        api.get("/products/search/" + query).then((response) => {
+            setProducts(response.data);
+            setSearching(false);
+            
+        }).catch((error) => {
+            console.error("Error searching products:", error);
+            setSearching(false);
+            
+        });
+
     }
 
     return (
@@ -33,15 +50,20 @@ export default function ProductsPage() {
            {
                 loading && <LoadingScreen/>
            }
+           {
+                searching && <LoadingScreen/>
+           }
 
            <div className="w-full h-[70px] justify-center items-center flex gap-4">
 
-                <input type="text" placeholder="Search products..." className="w-[400px] h-[40px] rounded-md p-2" value={query} onChange={(e) => setQuery(e.target.value)} />
-                <button className="w-[120px] h-[40px] bg-secondary text-white px-4 py-2 rounded-md" onClick={searchProducts}>Search</button>
+                <input type="text" placeholder="Search products..." className="w-[400px] h-[40px] rounded-md p-2 border border-black" value={query} onChange={(e) => setQuery(e.target.value)} />
+                <button className="w-[120px] h-[40px] bg-accent text-white px-4 py-2 rounded-md" onClick={searchProducts} disabled={searching}>
+                    {searching ? "Searching..." : "Search"}
+                </button>
                 <button onClick={() => {
                     setQuery("");
-                    setLoading(true);
-                }} className="w-[120px] h-[40px] bg-secondary text-white px-4 py-2 rounded-md">All Products</button>
+                    loadProducts();
+                }} className="w-[120px] h-[40px] bg-accent text-white px-4 py-2 rounded-md">All Products</button>
 
            </div>
 
