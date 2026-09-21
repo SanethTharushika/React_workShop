@@ -354,7 +354,7 @@ export async function verifyOTP(req, res) {
 
 export async function getAllUsers(req, res) {
 
-    if(req.user != null && req.user.isAdmin) {
+    if(req.user == null || !req.user.isAdmin) {
         res.status(401).json({ message: "Access denied. Only administrators can view all users." });
         return;
     }
@@ -377,6 +377,7 @@ export async function getAllUsers(req, res) {
 
         res.json({ 
             users: users, 
+            totalUsers: userCount,
             totalPages: totalPages, 
             currentPage: pageNumber
         });

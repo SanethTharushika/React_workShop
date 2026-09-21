@@ -14,7 +14,7 @@ const userRouter = express.Router();
 userRouter.post("/", createUser);
 userRouter.post("/login", loginUser);
 userRouter.get("/me", getUser);
-userRouter.get("/all", getAllUsers);
+userRouter.get("/all/:pageNumber/:pageSize", getAllUsers);
 userRouter.put("/", updateProfile);
 userRouter.post("/password" , updatePassword);
 userRouter.post("/google-login", googleLogin);

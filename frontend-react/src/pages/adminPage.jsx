@@ -11,6 +11,7 @@ import api from "../utils/api.js";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import LoadingScreen from "../components/loadingScreen.jsx";
+import AdminUsersPage from "./admin/adminUsersPage.jsx";
 
 
 export default function AdminPage() {
@@ -86,9 +87,10 @@ export default function AdminPage() {
                     <Routes>
                         <Route index element={<AdminOrdersPage />} />
                         <Route path="products" element={<AdminProductPage />} />
-                        <Route path="users" element={<h1>Users-page</h1>} />
+                        <Route path="users" element={<AdminUsersPage />} />
                         <Route path="add-product" element={<AdminAddProductForm />} />
                         <Route path="edit-product" element={<AdminEditProductForm />} />
+
                     </Routes>}
 
             </div>
