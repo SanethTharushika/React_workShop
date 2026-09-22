@@ -391,3 +391,33 @@ export async function getAllUsers(req, res) {
     }
 
 }
+
+export async function switchRole(req, res) {
+
+    if(req.user == null || !req.user.isAdmin) {
+        res.status(401).json({ message: "Access denied. Only administrators can switch roles." });
+        return;
+    }
+
+    try {
+
+        const email =  req.body.email; 
+        const user = await User.findOne({ email: email });
+
+        if(user == null) {
+            res.status(404).json({ message: "User not found." });
+            return;
+        }
+
+        if(user.email == req.user.email) {
+            res.status(400).json({ message: "You cannot change your own role." });
+            return;
+        }
+
+        await User.updateOne({ email: email }, { isAdmin: !user.isAdmin });
+        res.json({ message: "User role switched successfully." });
+
+    }catch (error) {
+        res.status(500).json({ message: "Error switching role.", error });
+    }
+}
