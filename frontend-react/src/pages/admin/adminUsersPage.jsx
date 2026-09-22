@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import toast from "react-hot-toast";
+import { BiRefresh } from "react-icons/bi";
 import LoadingScreen from "../../components/loadingScreen.jsx";
 
 export default function AdminUsersPage() {
@@ -12,6 +13,7 @@ export default function AdminUsersPage() {
     const [pageNumber, setPageNumber] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     const navigate = useNavigate();
 
@@ -60,11 +62,48 @@ export default function AdminUsersPage() {
                 setLoading(false);
             });
 
-    }, [navigate, pageNumber, pageSize]);
+    }, [navigate, pageNumber, pageSize, refreshTrigger]);
 
     if (loading) {
         return <LoadingScreen />;
     }
+
+    function handleBlockUser(email) {
+        const token = localStorage.getItem("token");
+        api.put("/users/state/" + email, {}, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then((response) => {
+                console.log("User state updated:", response.data);
+                toast.success("User state updated successfully.");
+                setRefreshTrigger((previousTrigger) => previousTrigger + 1);
+            })
+            .catch((error) => {
+                console.error("Failed to update user state:", error);
+                toast.error("Failed to update user state.");
+            }); 
+    }
+
+     function handleRoleToggle(email) {
+        const token = localStorage.getItem("token");
+        api.put("/users/role/" + email, {}, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then((response) => {
+                console.log("User role updated:", response.data);
+                toast.success("User role updated successfully.");
+                setRefreshTrigger((previousTrigger) => previousTrigger + 1);
+            })
+            .catch((error) => {
+                console.error("Failed to update user role:", error);
+                toast.error("Failed to update user role.");
+            }); 
+    }
+    
 
     return (
         <div className="w-full h-full overflow-y-scroll p-5 flex flex-col items-center pb-[100px]"> 
@@ -135,7 +174,7 @@ export default function AdminUsersPage() {
                                     </td>
 
                                     <td className="p-3">
-                                        {user.isAdmin ? "Admin" : "User"}
+                                        {user.isAdmin ? "Admin" : "User"} <BiRefresh onClick={() => handleRoleToggle(user.email)} className="inline-block ml-2 cursor-pointer text-accent hover:text-accent-dark text-xl" />
                                     </td>
 
                                     <td className="p-3">
@@ -143,7 +182,7 @@ export default function AdminUsersPage() {
                                     </td>
 
                                     <td className="p-3">
-                                        {user.isBlocked ? "Blocked" : "Active"}
+                                        {user.isBlocked ? "Blocked" : "Active"} <BiRefresh onClick={() => handleBlockUser(user.email)} className="inline-block ml-2 cursor-pointer text-accent hover:text-accent-dark text-xl" />
                                     </td>
 
                                    
