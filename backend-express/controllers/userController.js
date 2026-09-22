@@ -422,7 +422,7 @@ export async function switchRole(req, res) {
     }
 }
 
-export async function updateUserStatus(req, res) {
+export async function updateUserState(req, res) {
 
      if(req.user == null || !req.user.isAdmin) {
         res.status(401).json({ message: "Access denied. Only administrators can switch roles." });

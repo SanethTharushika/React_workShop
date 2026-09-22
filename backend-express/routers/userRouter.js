@@ -8,6 +8,8 @@ import { googleLogin } from '../controllers/userController.js';
 import { sendOTP } from '../controllers/userController.js';
 import { verifyOTP } from '../controllers/userController.js';
 import { getAllUsers } from '../controllers/userController.js';
+import { updateUserState } from '../controllers/userController.js';
+import { switchRole } from '../controllers/userController.js';
 
 const userRouter = express.Router();
 
@@ -20,5 +22,8 @@ userRouter.post("/password" , updatePassword);
 userRouter.post("/google-login", googleLogin);
 userRouter.post("/otp", sendOTP);
 userRouter.post("/verify-otp", verifyOTP);
+
+userRouter.put("/state/:email", updateUserState);
+userRouter.put("/role/:email", switchRole);
 
 export default userRouter;
