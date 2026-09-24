@@ -64,7 +64,7 @@ export default function Header() {
 
         </header>
 
-        <div className="fixed bottom-0 left-0 w-full h-[80px] bg-white shadow-2xl flex lg:hidden justify-evenly items-center ">
+        <div className="fixed bottom-0 left-0 w-full h-[80px] bg-white shadow-2xl flex lg:hidden justify-evenly items-center z-50 ">
             <Link to="/" className="h-full flex flex-col justify-center items-center text-accent text-3xl">
                 <IoHomeOutline/>
                 <span className="text-xs text-accent">Home</span>
