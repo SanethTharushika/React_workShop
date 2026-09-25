@@ -43,11 +43,7 @@ export default function LandingPage() {
       <div className="pointer-events-none absolute -right-24 bottom-1/4 h-80 w-80 rounded-full bg-violet-500/20 blur-3xl motion-safe:animate-pulse [animation-delay:1s]" />
 
       <div className="absolute top-0 left-0 flex h-full w-full flex-col items-center justify-center gap-6 px-6 text-center text-white text-2xl text-semibold">
-        <span className={badgeClass}>New arrivals every week</span>
-
-        <h1 className={titleClass}>Welcome to Our Store</h1>
-
-        <p className={subtitleClass}>Discover the best products at unbeatable prices.</p>
+        
 
         <a href="/products" className={buttonClass}>
           <span className="absolute inset-0 -translate-x-full skew-x-[-20deg] bg-white/25 transition-transform duration-700 group-hover:translate-x-full" />
