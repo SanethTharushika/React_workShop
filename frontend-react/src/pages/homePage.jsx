@@ -8,7 +8,7 @@ import CheckoutPage from "./checkout.jsx";
 import MyOrders from "./myOrder.jsx";
 import Settings from "./settings.jsx";
 import LandingPage from "./landingPage.jsx";
-import ContactUsPage from "./contactUsPage.jsx";
+import ContactUs from "./contactUs.jsx";
 
 export default function HomePage() {
     return (
@@ -23,7 +23,7 @@ export default function HomePage() {
                 {/* products */}
                 <Route path="/products" element={<ProductsPage/>}/>
                 {/* Contact us */}
-                <Route path="/contact-us" element={<ContactUsPage/>}/>
+                <Route path="/contact-us" element={<ContactUs/>}/>
                 {/* About us */}
                 <Route path="/about-us" element={<h1>About Us Page</h1>}/>
 
