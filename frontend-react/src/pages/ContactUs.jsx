@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
+/* ---------------- Data (replace with your real details) ---------------- */
 const contacts = [
   {
     title: "Email",
@@ -42,6 +43,7 @@ const faqs = [
   },
 ];
 
+/* ---------------- Scroll-reveal wrapper (Tailwind transitions only) ---------------- */
 function Reveal({ children, delay = 0, className = "" }) {
   const ref = useRef(null);
   const [shown, setShown] = useState(false);
@@ -89,48 +91,37 @@ function Hero() {
     }`;
 
   return (
-    <section className="relative isolate h-[72vh] min-h-[480px] w-full overflow-hidden bg-slate-950">
-      <div className="hero-grid absolute inset-0 -z-10 opacity-70" />
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(96,165,250,0.35),transparent_35%),linear-gradient(135deg,#020817_0%,#0f172a_38%,#111827_100%)]" />
-      <div className="absolute left-1/2 top-10 -z-10 h-72 w-72 -translate-x-1/2 rounded-full bg-sky-400/30 blur-3xl animate-glow" />
-      <div className="absolute left-12 top-20 -z-10 h-40 w-40 rounded-full bg-blue-500/20 blur-3xl animate-float" />
-      <div className="absolute bottom-12 right-16 -z-10 h-56 w-56 rounded-full bg-indigo-500/20 blur-3xl animate-float" style={{ animationDelay: "1.5s" }} />
+    <section className="relative isolate h-[70vh] min-h-[420px] w-full overflow-hidden bg-slate-950">
+      {/* Background: subtle grid + soft glow. Swap for an image: bg-[url('/hero.jpg')] bg-cover */}
+      <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:56px_56px]" />
+      <div className="absolute left-1/2 top-0 -z-10 h-80 w-[40rem] -translate-x-1/2 rounded-full bg-sky-500/25 blur-3xl motion-safe:animate-pulse" />
 
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 bg-gradient-to-b from-slate-950/35 via-slate-950/20 to-slate-950/40 px-6 text-center">
-        <span className={`rounded-full border border-white/20 bg-white/10 px-4 py-1 text-sm font-medium tracking-[0.2em] text-sky-100 uppercase backdrop-blur ${enter("delay-0")}`}>
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 bg-black/50 px-6 text-center">
+        <span className={`rounded-full border border-white/20 bg-white/10 px-4 py-1 text-sm text-slate-200 backdrop-blur ${enter("delay-0")}`}>
           We usually reply within a day
         </span>
 
-        <h1 className={`text-4xl font-black tracking-tight text-white md:text-6xl ${enter("delay-100")}`}>
-          Contact Us
-        </h1>
+        <h1 className={`text-4xl font-bold tracking-tight text-white md:text-6xl ${enter("delay-100")}`}>Contact Us</h1>
 
-        <p className={`max-w-2xl text-base text-slate-200 md:text-lg ${enter("delay-200")}`}>
-          Have questions about a product, an order, or a custom quote? Our team is ready to help you find the right solution.
+        <p className={`max-w-xl text-lg text-slate-200 ${enter("delay-200")}`}>
+          Have any questions? We're here to help!
         </p>
 
-        <div className={`flex flex-wrap items-center justify-center gap-4 ${enter("delay-300")}`}>
-          <a
-            href="#contact-form"
-            className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl bg-accent px-6 py-3 font-medium text-white shadow-[0_18px_40px_rgba(0,26,132,0.35)] transition duration-300 hover:-translate-y-0.5 hover:bg-accent-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white active:scale-95"
-          >
-            <span className="absolute inset-0 -translate-x-full skew-x-[-22deg] bg-white/20 animate-shine" />
-            <span className="relative">Get in Touch</span>
-            <svg className="relative h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-          </a>
-          <a
-            href="mailto:support@yourstore.lk"
-            className="rounded-xl border border-white/20 bg-white/5 px-5 py-3 font-medium text-slate-100 transition duration-300 hover:border-sky-200 hover:bg-white/10"
-          >
-            Email us
-          </a>
-        </div>
+        
+          href="#contact-form"
+          className={`group relative inline-flex items-center gap-2 overflow-hidden rounded-lg bg-accent px-6 py-3 font-medium text-white shadow-lg shadow-black/30 hover:bg-accent-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white active:scale-95 ${enter("delay-300")}`}
+        >
+          {/* shine sweep on hover */}
+          <span className="absolute inset-0 -translate-x-full skew-x-[-20deg] bg-white/20 transition-transform duration-700 group-hover:translate-x-full" />
+          <span className="relative">Get in Touch</span>
+          <svg className="relative h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </a>
       </div>
 
-      <a href="#contact-form" aria-label="Scroll to contact form" className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 transition hover:text-white motion-safe:animate-bounce">
-        <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <a href="#contact-form" aria-label="Scroll to contact form" className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/70 hover:text-white motion-safe:animate-bounce">
+        <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M6 9l6 6 6-6" />
         </svg>
       </a>
@@ -144,8 +135,8 @@ function ContactInfo() {
     <div className="space-y-4">
       {contacts.map((c, i) => (
         <Reveal key={c.title} delay={i * 120}>
-          <div className="contact-card group flex items-start gap-4 rounded-2xl border border-slate-200 bg-white/80 p-5 shadow-[0_18px_35px_rgba(15,23,42,0.04)] backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-[0_20px_40px_rgba(0,26,132,0.12)]">
-            <div className="card-icon grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 text-slate-700 transition duration-300 group-hover:bg-gradient-to-br group-hover:from-accent group-hover:to-accent-dark group-hover:text-white">
+          <div className="group flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-5 transition duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-lg">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-slate-100 text-slate-700 transition duration-300 group-hover:bg-accent group-hover:text-white">
               <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d={c.d} />
               </svg>
@@ -165,7 +156,7 @@ function ContactInfo() {
 /* ---------------- Floating-label field ---------------- */
 function Field({ id, label, textarea = false, type = "text" }) {
   const base =
-    "field-input peer w-full border-b border-slate-300 bg-transparent pb-2 pt-6 text-slate-900 placeholder-transparent outline-none transition duration-300 focus:border-accent";
+    "peer w-full border-b border-slate-300 bg-transparent pb-2 pt-6 text-slate-900 placeholder-transparent outline-none";
   return (
     <div className="relative">
       {textarea ? (
@@ -175,11 +166,11 @@ function Field({ id, label, textarea = false, type = "text" }) {
       )}
       <label
         htmlFor={id}
-        className="pointer-events-none absolute left-0 top-1 text-xs font-medium text-accent transition-all duration-300 peer-placeholder-shown:top-6 peer-placeholder-shown:text-base peer-placeholder-shown:text-slate-400 peer-focus:top-1 peer-focus:text-xs peer-focus:text-accent"
+        className="pointer-events-none absolute left-0 top-1 text-xs text-accent transition-all duration-300 peer-placeholder-shown:top-6 peer-placeholder-shown:text-base peer-placeholder-shown:text-slate-400 peer-focus:top-1 peer-focus:text-xs peer-focus:text-accent"
       >
         {label}
       </label>
-      <span className="field-focus-ring" />
+      <span className="absolute bottom-0 left-0 h-0.5 w-full origin-left scale-x-0 bg-accent transition-transform duration-500 peer-focus:scale-x-100" />
     </div>
   );
 }
@@ -221,7 +212,7 @@ function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="glass-panel space-y-8 rounded-[28px] border border-slate-200/80 bg-white/80 p-8 shadow-[0_25px_60px_rgba(15,23,42,0.08)]">
+    <form onSubmit={handleSubmit} className="space-y-8 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
       <div>
         <p className="mb-3 text-sm font-medium text-slate-600">What is this about?</p>
         <div className="flex flex-wrap gap-2">
@@ -230,9 +221,9 @@ function ContactForm() {
               key={t}
               type="button"
               onClick={() => setTopic(t)}
-              className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-all duration-300 active:scale-95 ${
+              className={`rounded-full border px-4 py-1.5 text-sm transition duration-300 active:scale-95 ${
                 topic === t
-                  ? "border-accent bg-accent text-white shadow-[0_10px_25px_rgba(0,26,132,0.25)]"
+                  ? "border-accent bg-accent text-white shadow-md"
                   : "border-slate-300 text-slate-600 hover:border-accent hover:text-accent"
               }`}
             >
@@ -251,7 +242,7 @@ function ContactForm() {
       <button
         type="submit"
         disabled={status === "sending"}
-        className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-accent px-6 py-3.5 font-medium text-white shadow-[0_16px_28px_rgba(0,26,132,0.25)] transition duration-300 hover:-translate-y-0.5 hover:bg-accent-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 active:scale-[0.98] disabled:opacity-80"
+        className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-lg bg-accent px-6 py-3 font-medium text-white transition duration-300 hover:bg-accent-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 active:scale-[0.98] disabled:opacity-80"
       >
         <span className="absolute inset-0 -translate-x-full skew-x-[-20deg] bg-white/20 transition-transform duration-700 group-hover:translate-x-full" />
         {status === "sending" ? (
@@ -275,19 +266,19 @@ function Faq() {
   const [open, setOpen] = useState(0);
 
   return (
-    <div className="divide-y divide-slate-200 overflow-hidden rounded-[28px] border border-slate-200 bg-white/80 shadow-[0_18px_45px_rgba(15,23,42,0.05)] backdrop-blur-sm">
+    <div className="divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white">
       {faqs.map((f, i) => {
         const isOpen = open === i;
         return (
-          <div key={f.q} className="transition-colors duration-300 hover:bg-slate-50/80">
+          <div key={f.q}>
             <button
               onClick={() => setOpen(isOpen ? -1 : i)}
               aria-expanded={isOpen}
-              className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-medium text-slate-900 transition hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
+              className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-medium text-slate-900 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
             >
               {f.q}
               <svg
-                className={`h-5 w-5 shrink-0 text-slate-400 transition-all duration-300 ${isOpen ? "rotate-180 text-accent" : ""}`}
+                className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-300 ${isOpen ? "rotate-180 text-accent" : ""}`}
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
               >
                 <path d="M6 9l6 6 6-6" />
@@ -308,17 +299,14 @@ function Faq() {
 /* ---------------- Page ---------------- */
 export default function ContactUs() {
   return (
-    <main className="bg-transparent text-slate-800 scroll-smooth">
+    <main className="bg-slate-50 text-slate-800 scroll-smooth">
       <Hero />
 
-      <section id="contact-form" className="mx-auto grid max-w-6xl gap-12 px-6 py-20 lg:grid-cols-[0.9fr_1.4fr] lg:py-24">
+      <section id="contact-form" className="mx-auto grid max-w-6xl gap-12 px-6 py-20 lg:grid-cols-[1fr_1.4fr]">
         <div className="space-y-6">
           <Reveal>
-            <div className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent-soft px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-              Support
-            </div>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">Talk to our team</h2>
-            <p className="mt-3 max-w-md text-base text-slate-600">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900">Talk to our team</h2>
+            <p className="mt-3 max-w-md text-slate-600">
               Questions about an order, help choosing parts, or a quote for a bulk build. Send us a message and we'll point you in the right direction.
             </p>
           </Reveal>
@@ -326,15 +314,13 @@ export default function ContactUs() {
         </div>
 
         <Reveal delay={150}>
-          <div className="animate-float" style={{ animationDelay: "0.3s" }}>
-            <ContactForm />
-          </div>
+          <ContactForm />
         </Reveal>
       </section>
 
       <section className="mx-auto max-w-3xl px-6 pb-24">
         <Reveal>
-          <h2 className="mb-6 text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">Frequently asked questions</h2>
+          <h2 className="mb-6 text-2xl font-bold tracking-tight text-slate-900">Frequently asked questions</h2>
           <Faq />
         </Reveal>
       </section>
