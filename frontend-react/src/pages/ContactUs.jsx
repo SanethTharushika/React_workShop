@@ -92,22 +92,21 @@ function Hero() {
 
   return (
     <section className="relative isolate h-[70vh] min-h-[420px] w-full overflow-hidden bg-slate-950">
-      {/* Background: subtle grid + soft glow. Swap for an image: bg-[url('/hero.jpg')] bg-cover */}
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:56px_56px]" />
       <div className="absolute left-1/2 top-0 -z-10 h-80 w-[40rem] -translate-x-1/2 rounded-full bg-sky-500/25 blur-3xl motion-safe:animate-pulse" />
 
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 bg-black/50 px-6 text-center">
-        <span className={`rounded-full border border-white/20 bg-white/10 px-4 py-1 text-sm text-slate-200 backdrop-blur ${enter("delay-0")}`}>
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 bg-gray-100 px-6 text-center">
+        <span className={`rounded-full border border-white/20 bg-white/10 px-4 py-1 text-sm text-accent backdrop-blur ${enter("delay-0")}`}>
           We usually reply within a day
         </span>
 
-        <h1 className={`text-4xl font-bold tracking-tight text-white md:text-6xl ${enter("delay-100")}`}>Contact Us</h1>
+        <h1 className={`text-4xl font-bold tracking-tight text-secondary md:text-6xl ${enter("delay-100")}`}>Contact Us</h1>
 
-        <p className={`max-w-xl text-lg text-slate-200 ${enter("delay-200")}`}>
+        <p className={`max-w-xl text-lg text-accent ${enter("delay-200")}`}>
           Have any questions? We're here to help!
         </p>
 
-        
+        <a
           href="#contact-form"
           className={`group relative inline-flex items-center gap-2 overflow-hidden rounded-lg bg-accent px-6 py-3 font-medium text-white shadow-lg shadow-black/30 hover:bg-accent-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white active:scale-95 ${enter("delay-300")}`}
         >
