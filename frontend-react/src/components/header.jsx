@@ -12,7 +12,7 @@ export default function Header() {
         <header className="w-full h-[100px] bg-accent flex items-center justify-center lg:justify-between px-6">
 
             {/* Logo */}
-            <Link to="/" className="w-[70px] h-[70px]">
+            <Link to="/" className="w-[90px] h-[70px]">
                 <img
                     src="/logo.jpg"
                     alt="Logo"
