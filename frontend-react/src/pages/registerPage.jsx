@@ -1,4 +1,4 @@
-import { MdEmail, MdPassword } from "react-icons/md";
+import { MdEmail, MdPassword, MdPhone } from "react-icons/md";
 import { FaGoogle } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -12,6 +12,7 @@ export default function RegisterPage() {
     const [password, setPassword] = useState("");
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate(); 
@@ -62,7 +63,8 @@ export default function RegisterPage() {
                     email: email,
                     password: password,
                     firstName: firstName,
-                    lastName: lastName
+                    lastName: lastName,
+                    phoneNumber: phoneNumber
                 }
             );
 
@@ -186,6 +188,50 @@ export default function RegisterPage() {
 
                     </div>
 
+                </div>
+
+                <div className="w-full">
+
+                    <label className="text-white text-lg flex items-center gap-2 mb-1">
+                        <MdPhone />
+                        Phone Number
+                    </label>
+                    <input className="w-full
+                        h-[45px]
+                        rounded-lg
+                        px-3
+                        border
+                        border-white/70
+                        bg-black/20
+                        text-white
+                        placeholder:text-gray-300
+                        mb-3
+                        outline-none
+
+                        transition-all
+                        duration-300
+                        ease-out
+
+                        hover:scale-[1.03]
+                        hover:border-[#18c3cd]
+                        hover:bg-black/30
+                        hover:shadow-xl
+                        hover:shadow-cyan-400/30
+
+                        focus:scale-[1.03]
+                        focus:border-[#18c3cd]
+                        focus:bg-black/30
+                        focus:ring-2
+                        focus:ring-[#18c3cd]/30
+                        focus:shadow-xl
+                        focus:shadow-cyan-400/30"  placeholder="94712345678"
+                            onChange={
+                                (e) => {
+                                    setPhoneNumber(e.target.value);
+                                }
+                            }
+                            value={phoneNumber}
+                            ></input>
                 </div>
 
                 <div className="w-full">
