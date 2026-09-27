@@ -286,7 +286,9 @@ export default function RegisterPage() {
 
                 {/* Password */}
 
-                <div className="w-full">
+                <div className="w-full mt-5 flex flex-row gap-2">
+
+                <div className="w-1/2">
 
                     <label className="text-white text-lg flex items-center gap-2 mb-1">
                         <MdPassword />
@@ -335,7 +337,7 @@ export default function RegisterPage() {
 
                 </div>
 
-                                <div className="w-full">
+                                <div className="w-1/2">
 
                     <label className="text-white text-lg flex items-center gap-2 mb-1">
                         <MdPassword />
@@ -383,6 +385,7 @@ export default function RegisterPage() {
                     />
 
                 </div>
+            </div>
 
 
 
