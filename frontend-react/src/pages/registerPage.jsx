@@ -432,7 +432,7 @@ export default function RegisterPage() {
 
                 {/* Register */}
 
-                <p className="text-white text-sm mt-4">
+                <p className="text-white text-sm mt-6">
 
                     Already have an account?{" "}
 
@@ -446,56 +446,7 @@ export default function RegisterPage() {
                 </p>
 
 
-                {/* Divider */}
-
-                <div className="flex items-center gap-3 my-5">
-
-                    <div className="h-[1px] bg-white/30 flex-1"></div>
-
-                    <span className="text-white/70 text-sm">
-                        OR
-                    </span>
-
-                    <div className="h-[1px] bg-white/30 flex-1"></div>
-
-                </div>
-
-
-                {/* Google Button */}
-
-                <button onClick={() => googlelogin()}
-                    className="
-                        w-full
-                        h-[45px]
-                        bg-[#18c3cd]
-                        text-white
-                        rounded-lg
-                        flex
-                        justify-center
-                        items-center
-                        gap-2
-                        border
-                        border-white/40
-
-                        transition-all
-                        duration-300
-                        ease-out
-
-                        hover:scale-[1.04]
-                        hover:bg-[#13aab3]
-                        hover:shadow-xl
-                        hover:shadow-cyan-400/40
-
-                        active:scale-[0.97]
-                    "
-                >
-
-                    <FaGoogle />
-
-                    Sign In with Google
-
-                </button>
-
+                
             </form>
 
         </div>
