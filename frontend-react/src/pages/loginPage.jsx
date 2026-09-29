@@ -29,11 +29,15 @@ export default function LoginPage() {
                     }
 
                 }).catch((err) => {
-                    console.log(err);
+                    toast.error(
+                        err?.response?.data?.message ||
+                        "Google login failed"
+                    );
                 })
             },
             onError: (error) => {
-            console.log(error);
+                toast.error("Google login was cancelled or failed");
+                console.error(error);
             }  
         } 
 
@@ -292,7 +296,7 @@ export default function LoginPage() {
 
                 {/* Google Button */}
 
-                <button onClick={() => googlelogin()}
+                <button type="button" onClick={() => googlelogin()}
                     className="
                         w-full
                         h-[45px]

@@ -72,6 +72,7 @@ export async function loginUser(req, res) {
                     email: user.email,
                     firstName: user.firstName,
                     lastName: user.lastName,
+                    // phoneNumber: user.phoneNumber,
                     isAdmin: user.isAdmin,
                     isBlocked: user.isBlocked,
                     isEmailVerified: user.isEmailVerified,
@@ -124,6 +125,7 @@ export async function getUser(req, res) {
             isAdmin: user.isAdmin,
             isBlocked: user.isBlocked,
             isEmailVerified: user.isEmailVerified,
+            // phoneNumber: user.phoneNumber,
             image: user.image
          });
 
@@ -167,6 +169,7 @@ export async function updateProfile(req, res) {
         await User.updateOne({ email: email }, {
             firstName: req.body.firstName,
             lastName: req.body.lastName,
+
             image: req.body.image
         });
 
@@ -181,6 +184,11 @@ export async function updateProfile(req, res) {
 export async function googleLogin(req, res) {
 
     const accessToken = req.body.accessToken;
+
+    if (!accessToken) {
+        res.status(400).json({ message: "Google access token is required" });
+        return;
+    }
 
     try {
     const response = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
@@ -204,6 +212,7 @@ export async function googleLogin(req, res) {
             password: passwordHash,
             firstName: response.data.given_name,
             lastName: response.data.family_name,
+            phoneNumber: response.data.phone_number,
             isEmailVerified: true,
             image: response.data.picture    
         });
@@ -214,6 +223,7 @@ export async function googleLogin(req, res) {
             email: newUser.email,
             firstName: newUser.firstName,
             lastName: newUser.lastName,
+            phoneNumber: newUser.phoneNumber,
             isAdmin: newUser.isAdmin,
             isBlocked: newUser.isBlocked,
             isEmailVerified: newUser.isEmailVerified,
@@ -231,6 +241,7 @@ export async function googleLogin(req, res) {
             email: user.email,
             firstName: user.firstName,
             lastName: user.lastName,
+            phoneNumber: user.phoneNumber,
             isAdmin: user.isAdmin,
             isBlocked: user.isBlocked,
             isEmailVerified: user.isEmailVerified,
@@ -247,6 +258,10 @@ export async function googleLogin(req, res) {
 
     } catch (error) {
         console.error(error);
+        res.status(401).json({
+            message: error.response?.data?.error_description ||
+                "Google login failed"
+        });
     }
 
 }
