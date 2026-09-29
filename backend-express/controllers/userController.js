@@ -469,3 +469,14 @@ export async function updateUserState(req, res) {
 
 
 }
+
+export async function logoutUser(req, res) {
+
+    if (req.user == null) {
+        return res.status(401).json({ message: "Unauthorized access..." });
+    }
+
+    const role = req.user.isAdmin ? "Admin" : "User";
+    res.json({ message: `${role} logged out successfully.` });
+
+}
