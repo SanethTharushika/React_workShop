@@ -8,6 +8,7 @@ export default function UserData() {
 
     const [user, setUser] = useState(null);
     const [selectedOption, setSelectedOption] = useState("me");
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
     const navigate = useNavigate();
 
@@ -34,6 +35,13 @@ export default function UserData() {
 
     }, []);
 
+    function confirmLogout() {
+        localStorage.removeItem("token");
+        setUser(null);
+        setShowLogoutConfirm(false);
+        toast.success("Logged out successfully");
+        navigate("/");
+    }
 
     return (
         <>
@@ -74,8 +82,6 @@ export default function UserData() {
                             className="w-6 h-6 rounded-full inline-block mr-2"
                         />
 
-                        {/* <span className=" lg:hidden text-accent text-sm">{user.firstName}</span> */}
-
                         <select
                             className="bg-transparent  text-sm text-accent text-center lg:text-white"
                             value={selectedOption}
@@ -87,33 +93,17 @@ export default function UserData() {
 
                                 if (value === "settings") {
 
-                                    toast.success(
-                                        "Settings selected"
-                                    );
-
                                     navigate("/settings");
                                 }
 
                                 if (value === "my-orders") {
-
-                                    toast.success(
-                                        "My Orders selected"
-                                    );
 
                                     navigate("/my-orders");
                                 }
 
                                 if (value === "logout") {
 
-                                    localStorage.removeItem("token");
-
-                                    setUser(null);
-
-                                    toast.success(
-                                        "Logged out successfully"
-                                    );
-
-                                    navigate("/");
+                                    setShowLogoutConfirm(true);
                                 }
 
                                 setSelectedOption("me");
@@ -151,6 +141,34 @@ export default function UserData() {
 
                 )
             }
+
+            {showLogoutConfirm && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl shadow-2xl p-6 w-[90%] max-w-sm transition-transform duration-200">
+                        <h2 className="text-lg font-semibold text-gray-800 mb-2">Log out?</h2>
+                        <p className="text-sm text-gray-500 mb-6">
+                            You'll need to sign in again to access your account.
+                        </p>
+
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => setShowLogoutConfirm(false)}
+                                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-600
+                                           transition-all duration-200 hover:bg-gray-100 active:scale-95"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmLogout}
+                                className="px-4 py-2 rounded-lg bg-red-600 text-white font-medium
+                                           transition-all duration-200 hover:bg-red-700 hover:shadow-md active:scale-95"
+                            >
+                                Log out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
