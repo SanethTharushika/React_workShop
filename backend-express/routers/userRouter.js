@@ -11,11 +11,14 @@ import { getAllUsers } from '../controllers/userController.js';
 import { updateUserState } from '../controllers/userController.js';
 import { switchRole } from '../controllers/userController.js';
 import { logoutUser } from '../controllers/userController.js';
+import { validate } from "../middlewares/validate.js";
+import { registerSchema, loginSchema } from "../validation/userSchemas.js";
+
 
 const userRouter = express.Router();
 
-userRouter.post("/", createUser);
-userRouter.post("/login", loginUser);
+userRouter.post("/", validate(registerSchema), createUser);
+userRouter.post("/login", validate(loginSchema), loginUser);
 userRouter.get("/me", getUser);
 userRouter.get("/all/:pageNumber/:pageSize", getAllUsers);
 userRouter.put("/", updateProfile);
