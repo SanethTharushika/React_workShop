@@ -46,6 +46,7 @@ export default function RegisterPage() {
     
 
     async function handleRegister(event) {
+        event.preventDefault();
 
         if (password !== confirmPassword) {
             toast.error("Passwords do not match");
@@ -71,8 +72,10 @@ export default function RegisterPage() {
             navigate("/signin");
 
         } catch (error) {
+            const validationError = error?.response?.data?.errors?.[0]?.message;
 
             toast.error(
+                validationError ||
                 error?.response?.data?.message ||
                 "Registration failed"
             );
