@@ -153,29 +153,38 @@ export default function UserData() {
             {
                 user == null ? (
 
-                    <div className="lg:flex">
+                    <div className="flex items-center">
+
+                        {/* Desktop */}
+                        <div className="hidden lg:flex items-center gap-3">
+                            <Link
+                                to="/signin"
+                                className="group relative px-3 py-2 text-sm font-medium text-white/90 transition-colors duration-200 hover:text-white"
+                            >
+                                Login
+                                <span className="absolute bottom-1 left-3 right-3 h-0.5 origin-left scale-x-0 rounded-full bg-accent transition-transform duration-300 group-hover:scale-x-100" />
+                            </Link>
+
+                            <Link
+                                to="/signup"
+                                className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white shadow-md
+                       transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg
+                       hover:shadow-accent/40 hover:brightness-110 active:scale-95"
+                            >
+                                Register
+                            </Link>
+                        </div>
+
+                        {/* Mobile */}
                         <Link
                             to="/signin"
-                            className="text-white hidden lg:block hover:text-gray-300"
+                            className="flex h-full flex-col items-center justify-center gap-0.5 text-3xl text-accent
+                   transition-all duration-200 active:scale-90 lg:hidden"
                         >
-                            Login
+                            <CiLogin className="transition-transform duration-300 hover:translate-x-0.5" />
+                            <span className="text-xs font-medium text-accent">Login</span>
                         </Link>
 
-                        <span className="text-white hidden lg:block">
-                            {" | "}
-                        </span>
-
-                        <Link
-                            to="/signup"
-                            className="text-white hidden lg:block hover:text-gray-300"
-                        >
-                            Register
-                        </Link>
-
-                        <Link to="/signin" className="h-full flex flex-col lg:hidden justify-center items-center text-accent text-3xl">
-                            <CiLogin />
-                            <span className="text-xs text-accent">Login</span>
-                        </Link>
                     </div>
 
                 ) : (
