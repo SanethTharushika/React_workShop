@@ -6,8 +6,8 @@ import CategorySidebar from "../components/CategorySidebar.jsx";
 
 export default function ProductsPage() {
 
-    const [products, setProducts] = useState([]);       
-    const [allProducts, setAllProducts] = useState([]); 
+    const [products, setProducts] = useState([]);
+    const [allProducts, setAllProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [query, setQuery] = useState("");
     const [searching, setSearching] = useState(false);
@@ -34,7 +34,6 @@ export default function ProductsPage() {
 
     function searchProducts() {
 
-        
         if (query.trim() === "") {
             loadProducts();
             return;
@@ -53,65 +52,65 @@ export default function ProductsPage() {
 
     }
 
-    
     const categories = [...new Set(allProducts.map((p) => p.category).filter(Boolean))];
 
-    
     const visibleProducts = products.filter(
         (p) => selectedCategory === "All" || p.category === selectedCategory
     );
 
     return (
-        <div className="w-full min-h-screen bg-primary px-4 py-10 lg:px-10">
+        <div className="flex min-h-screen w-full flex-col bg-primary lg:flex-row">
 
             {loading && <LoadingScreen />}
             {searching && <LoadingScreen />}
 
-            {/* Search bar */}
-            <div className="mx-auto mb-8 flex w-full max-w-7xl flex-wrap items-center justify-center gap-3">
-                <input
-                    type="text"
-                    placeholder="Search products..."
-                    className="h-[40px] w-full rounded-md border border-black p-2 sm:w-[400px]"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") searchProducts();
-                    }}
-                />
-                <button
-                    className="h-[40px] w-[120px] rounded-md bg-accent px-4 py-2 text-white
-                               transition-all duration-200 hover:brightness-110 active:scale-95"
-                    onClick={searchProducts}
-                    disabled={searching}
-                >
-                    {searching ? "Searching..." : "Search"}
-                </button>
-                <button
-                    onClick={() => {
-                        setQuery("");
-                        setSelectedCategory("All");
-                        loadProducts();
-                    }}
-                    className="h-[40px] w-[120px] rounded-md bg-accent px-4 py-2 text-white
-                               transition-all duration-200 hover:brightness-110 active:scale-95"
-                >
-                    All Products
-                </button>
-            </div>
+            {/* Left navigation sidebar */}
+            <CategorySidebar
+                categories={categories}
+                products={products}
+                selected={selectedCategory}
+                onSelect={setSelectedCategory}
+            />
 
-            {/* Sidebar + products */}
-            {!loading && (
-                <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 lg:flex-row">
+            {/* Main content */}
+            <main className="min-w-0 flex-1 px-4 py-10 lg:px-10">
 
-                    <CategorySidebar
-                        categories={categories}
-                        products={products}
-                        selected={selectedCategory}
-                        onSelect={setSelectedCategory}
+                {/* Search bar */}
+                <div className="mb-8 flex w-full flex-wrap items-center justify-center gap-3">
+                    <input
+                        type="text"
+                        placeholder="Search products..."
+                        className="h-[40px] w-full rounded-md border border-black p-2 sm:w-[400px]"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") searchProducts();
+                        }}
                     />
+                    <button
+                        className="h-[40px] w-[120px] rounded-md bg-accent px-4 py-2 text-white
+                                   transition-all duration-200 hover:brightness-110 active:scale-95"
+                        onClick={searchProducts}
+                        disabled={searching}
+                    >
+                        {searching ? "Searching..." : "Search"}
+                    </button>
+                    <button
+                        onClick={() => {
+                            setQuery("");
+                            setSelectedCategory("All");
+                            loadProducts();
+                        }}
+                        className="h-[40px] w-[120px] rounded-md bg-accent px-4 py-2 text-white
+                                   transition-all duration-200 hover:brightness-110 active:scale-95"
+                    >
+                        All Products
+                    </button>
+                </div>
 
-                    <div className="flex flex-1 flex-wrap content-start justify-center gap-6 lg:justify-start">
+                {/* Products */}
+                {!loading && (
+                    <div className="flex flex-wrap content-start justify-center gap-6">
                         {visibleProducts.length > 0 ? (
                             visibleProducts.map((product) => (
                                 <ProductCard
@@ -125,9 +124,8 @@ export default function ProductsPage() {
                             </p>
                         )}
                     </div>
-
-                </div>
-            )}
+                )}
+            </main>
         </div>
     );
 }
