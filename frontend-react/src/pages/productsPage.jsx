@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import api from "../utils/api.js";
 import LoadingScreen from "../components/loadingScreen.jsx"; 
-import ProductCard from "../components/productCard.jsx";
+import ProductCard from "../components/productCard.jsx"; 
 
 
 export default function ProductsPage() {
