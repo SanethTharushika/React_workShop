@@ -6,8 +6,8 @@ import CategorySidebar from "../components/CategorySidebar.jsx";
 
 export default function ProductsPage() {
 
-    const [products, setProducts] = useState([]);       // currently displayed (all or search results)
-    const [allProducts, setAllProducts] = useState([]); // full list, used to build the category list
+    const [products, setProducts] = useState([]);       
+    const [allProducts, setAllProducts] = useState([]); 
     const [loading, setLoading] = useState(true);
     const [query, setQuery] = useState("");
     const [searching, setSearching] = useState(false);

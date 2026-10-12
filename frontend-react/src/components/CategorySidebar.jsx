@@ -23,7 +23,7 @@ export default function CategorySidebar({ categories, products, selected, onSele
                                     ? "bg-accent font-semibold text-white shadow-md"
                                     : "text-gray-600 hover:translate-x-1 hover:bg-gray-100"}`}
                         >
-                            <span>{cat === "All" ? "All Products" : cat}</span>
+                            <span className="capitalize">{cat === "All" ? "All Products" : cat}</span>
                             <span
                                 className={`rounded-full px-2 py-0.5 text-xs
                                             ${active ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500"}`}
@@ -42,15 +42,16 @@ export default function CategorySidebar({ categories, products, selected, onSele
             {/* Mobile: open button */}
             <button
                 onClick={() => setOpen(true)}
-                className="mb-4 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white
+                className="m-4 self-start rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white
                            transition-all active:scale-95 lg:hidden"
             >
                 ☰ Categories
             </button>
 
-            {/* Desktop sidebar */}
-            <aside className="sticky top-4 hidden h-fit w-64 shrink-0 rounded-2xl bg-white p-4 shadow-md lg:block">
-                <h3 className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            {/* Desktop: full-height navigation sidebar on the left edge */}
+            <aside className="sticky top-0 hidden h-screen w-64 shrink-0 overflow-y-auto border-r border-gray-200
+                              bg-white p-4 shadow-lg lg:block">
+                <h3 className="mb-4 px-3 pt-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
                     Categories
                 </h3>
                 {list}
