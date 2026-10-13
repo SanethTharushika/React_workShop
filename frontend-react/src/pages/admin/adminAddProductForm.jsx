@@ -44,6 +44,12 @@ export default function AdminAddProductForm() {
             return;
         }
 
+        if (!category) {
+            toast.error("Please choose a product category");
+            setIsLoading(false);
+            return;
+        }
+
         const imageUploadPromises = [];
 
         for (let i = 0; i < image.length; i++) {
@@ -321,6 +327,7 @@ export default function AdminAddProductForm() {
                                 label="Category"
                                 value={category}
                                 onChange={setCategory}
+                                placeholder="Choose a category"
                                 options={[
                                     ["motherboard", "Motherboard"],
                                     ["graphic-card", "Graphic Card"],
@@ -512,6 +519,7 @@ function SelectField({
     label,
     value,
     onChange,
+    placeholder,
     options
 }) {
 
@@ -531,6 +539,11 @@ function SelectField({
                 }}
                 className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-accent focus:bg-white focus:ring-4 focus:ring-blue-100"
             >
+                {placeholder && (
+                    <option value="" disabled>
+                        {placeholder}
+                    </option>
+                )}
 
                 {
                     options.map(
