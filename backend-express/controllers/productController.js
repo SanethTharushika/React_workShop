@@ -22,7 +22,27 @@ export async function createProduct(req, res) {
         await product.save();
         res.status(201).json({ message: "Product created successfully.", product });
     } catch (error) {
-        res.status(500).json({ message: "Error creating product.", error });
+        console.error("Error creating product:", error);
+
+        if (error?.name === "ValidationError") {
+            res.status(400).json({
+                message: "Product validation failed.",
+                errors: Object.values(error.errors).map((fieldError) => ({
+                    field: fieldError.path,
+                    message: fieldError.message
+                }))
+            });
+            return;
+        }
+
+        if (error?.code === 11000) {
+            res.status(409).json({
+                message: "A product with this ID already exists."
+            });
+            return;
+        }
+
+        res.status(500).json({ message: "Error creating product." });
     }
 
 }

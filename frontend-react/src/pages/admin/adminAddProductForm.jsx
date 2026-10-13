@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-    FiArrowLeft,
     FiBox,
     FiDollarSign,
     FiImage,
@@ -60,21 +59,24 @@ export default function AdminAddProductForm() {
             );
 
             const altNamesArray =
-                altNames.split(",");
+                altNames
+                    .split(",")
+                    .map((value) => value.trim())
+                    .filter(Boolean);
 
             const requestBody = {
-                productId: productId,
-                name: name,
+                productId: productId.trim(),
+                name: name.trim(),
                 altNames: altNamesArray,
-                description: description,
-                price: price,
-                labelledPrice: labelledPrice,
+                description: description.trim(),
+                price: Number(price),
+                labelledPrice: Number(labelledPrice),
                 image: imageUrls,
                 isAvailable: isAvailable,
-                category: category,
-                stock: stock,
-                brand: brand,
-                model: model
+                category: category.trim(),
+                stock: Number(stock),
+                brand: brand.trim(),
+                model: model.trim()
             };
 
             await api.post(
@@ -100,10 +102,17 @@ export default function AdminAddProductForm() {
 
         } catch (error) {
 
+            const validationErrors = error?.response?.data?.errors;
+            const errorMessage = Array.isArray(validationErrors)
+                ? validationErrors
+                    .map((item) => `${item.field}: ${item.message}`)
+                    .join(", ")
+                : error?.response?.data?.message ||
+                  error?.message ||
+                  "Failed to add product";
+
             toast.error(
-                error?.response?.data?.message ||
-                error?.message ||
-                "Failed to add product"
+                errorMessage
             );
 
             setIsLoading(false);
