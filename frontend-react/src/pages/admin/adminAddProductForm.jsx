@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
     FiBox,
@@ -22,6 +22,7 @@ export default function AdminAddProductForm() {
     const [price, setPrice] = useState("");
     const [labelledPrice, setLabelledPrice] = useState("");
     const [image, setImage] = useState([]);
+    const [imagePreviewUrls, setImagePreviewUrls] = useState([]);
     const [isAvailable, setIsAvailable] = useState(true);
     const [category, setCategory] = useState("");
     const [stock, setStock] = useState(0);
@@ -30,6 +31,20 @@ export default function AdminAddProductForm() {
     const [isloading, setIsLoading] = useState(false);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const previewUrls = image.map((file) =>
+            URL.createObjectURL(file)
+        );
+
+        setImagePreviewUrls(previewUrls);
+
+        return () => {
+            previewUrls.forEach((url) => {
+                URL.revokeObjectURL(url);
+            });
+        };
+    }, [image]);
 
     async function addProduct() {
 
@@ -377,7 +392,7 @@ export default function AdminAddProductForm() {
                                 className="sr-only"
                                 onChange={(e) => {
                                     setImage(
-                                        e.target.files
+                                        Array.from(e.target.files)
                                     );
                                 }}
                             />
@@ -388,16 +403,31 @@ export default function AdminAddProductForm() {
                         {
                             image.length > 0 && (
 
-                                <div className="mt-4 rounded-xl bg-blue-50 px-4 py-3 text-center">
+                                <div className="mt-4">
 
-                                    <p className="text-sm font-semibold text-accent">
-                                        {image.length}
-                                        {" "}
-                                        image
-                                        {image.length > 1 ? "s" : ""}
-                                        {" "}
-                                        selected
+                                    <p className="mb-3 text-sm font-semibold text-accent">
+                                        {image.length} image
+                                        {image.length > 1 ? "s" : ""} selected
                                     </p>
+
+                                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                                        {imagePreviewUrls.map((previewUrl, index) => (
+                                            <div
+                                                key={`${previewUrl}-${image[index].name}`}
+                                                className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50"
+                                            >
+                                                <img
+                                                    src={previewUrl}
+                                                    alt={`Product preview ${index + 1}`}
+                                                    className="h-28 w-full object-cover"
+                                                />
+
+                                                <p className="truncate px-2 py-2 text-xs text-slate-500">
+                                                    {image[index].name}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
 
                                 </div>
 
