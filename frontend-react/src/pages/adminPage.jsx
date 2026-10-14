@@ -70,9 +70,9 @@ export default function AdminPage() {
     }, []);
 
     return (
-        <div className="flex h-screen w-full overflow-hidden bg-primary">
+        <div className="fixed inset-0 flex w-full overflow-hidden bg-primary">
             {/* Sidebar */}
-            <div className="flex h-screen w-[300px] shrink-0 flex-col bg-white shadow-2xl">
+            <div className="flex h-full w-[300px] shrink-0 flex-col bg-white shadow-2xl">
                 <Link to="/admin" className="w-full h-[100px] block overflow-hidden">
                     <img
                         src="/logo.jpg"
@@ -89,17 +89,19 @@ export default function AdminPage() {
             </div>
 
             {/* Content */}
-            <div className="flex h-screen min-w-0 flex-1 overflow-y-auto p-4">
+            <div className="flex h-full min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-4">
                 {user == null ? (
                     <LoadingScreen />
                 ) : (
-                    <Routes>
-                        <Route index element={<AdminOrdersPage />} />
-                        <Route path="products" element={<AdminProductPage />} />
-                        <Route path="users" element={<AdminUsersPage />} />
-                        <Route path="add-product" element={<AdminAddProductForm />} />
-                        <Route path="edit-product" element={<AdminEditProductForm />} />
-                    </Routes>
+                    <div className="min-h-0 min-w-0 flex-1">
+                        <Routes>
+                            <Route index element={<AdminOrdersPage />} />
+                            <Route path="products" element={<AdminProductPage />} />
+                            <Route path="users" element={<AdminUsersPage />} />
+                            <Route path="add-product" element={<AdminAddProductForm />} />
+                            <Route path="edit-product" element={<AdminEditProductForm />} />
+                        </Routes>
+                    </div>
                 )}
             </div>
         </div>
