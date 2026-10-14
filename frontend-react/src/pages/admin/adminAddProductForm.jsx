@@ -141,10 +141,10 @@ export default function AdminAddProductForm() {
     }
 
     return (
-        <div className="w-full p-2 md:p-4">
+        <div className="flex h-full min-h-0 w-full flex-col p-2 md:p-4">
 
             
-            <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div className="mb-8 shrink-0 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
 
                 <div>
 
@@ -164,7 +164,8 @@ export default function AdminAddProductForm() {
 
 
             {/* Main Form */}
-            <div className="mx-auto w-full max-w-4xl space-y-6">
+            <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+                <div className="mx-auto w-full max-w-4xl space-y-6">
 
                 {/* Left Column */}
                 <div className="space-y-6">
@@ -473,6 +474,9 @@ export default function AdminAddProductForm() {
             </div>
 
         </div>
+
+        </div>
+
     );
 }
 
