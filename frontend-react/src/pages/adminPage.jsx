@@ -70,9 +70,9 @@ export default function AdminPage() {
     }, []);
 
     return (
-        <div className="w-full min-h-screen bg-primary flex">
+        <div className="flex h-screen w-full overflow-hidden bg-primary">
             {/* Sidebar */}
-            <div className="w-[300px] min-h-screen bg-white flex flex-col shadow-2xl">
+            <div className="flex h-screen w-[300px] shrink-0 flex-col bg-white shadow-2xl">
                 <Link to="/admin" className="w-full h-[100px] block overflow-hidden">
                     <img
                         src="/logo.jpg"
@@ -89,7 +89,7 @@ export default function AdminPage() {
             </div>
 
             {/* Content */}
-            <div className="w-[calc(100%-300px)] min-h-screen p-4 flex">
+            <div className="flex h-screen min-w-0 flex-1 overflow-y-auto p-4">
                 {user == null ? (
                     <LoadingScreen />
                 ) : (
