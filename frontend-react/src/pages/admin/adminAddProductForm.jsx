@@ -128,7 +128,7 @@ export default function AdminAddProductForm() {
     return (
         <div className="w-full min-h-full p-2 md:p-4">
 
-            {/* Top Header */}
+            
             <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
 
                 <div>
@@ -144,36 +144,12 @@ export default function AdminAddProductForm() {
                 </div>
 
 
-                <div className="flex items-center gap-3">
-
-                    <Link
-                        to="/admin/products"
-                        className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-600 shadow-sm transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
-                    >
-                        Cancel
-                    </Link>
-
-                    <button
-                        disabled={isloading}
-                        onClick={addProduct}
-                        className="inline-flex items-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                        <FiSave />
-
-                        {
-                            isloading
-                                ? "Saving..."
-                                : "Save Product"
-                        }
-                    </button>
-
-                </div>
 
             </div>
 
 
             {/* Main Form */}
-            <div className="grid gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(320px,0.85fr)]">
+            <div className="mx-auto w-full max-w-4xl space-y-6">
 
                 {/* Left Column */}
                 <div className="space-y-6">
@@ -429,6 +405,38 @@ export default function AdminAddProductForm() {
                         }
 
                     </section>
+
+             <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+
+               
+
+
+                <div className="flex items-center gap-3">
+
+                    <Link
+                        to="/admin/products"
+                        className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-600 shadow-sm transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                    >
+                        Cancel
+                    </Link>
+
+                    <button
+                        disabled={isloading}
+                        onClick={addProduct}
+                        className="inline-flex items-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                        <FiSave />
+
+                        {
+                            isloading
+                                ? "Saving..."
+                                : "Save Product"
+                        }
+                    </button>
+
+                </div>
+
+            </div>
 
                 </div>
 
