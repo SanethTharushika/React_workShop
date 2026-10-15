@@ -6,12 +6,21 @@ import {
     FiImage,
     FiLayers,
     FiSave,
-    FiUploadCloud
+    FiUploadCloud,
+    FiX
 } from "react-icons/fi";
 
 import uploadMedia from "../../utils/mediaUpload";
 import toast from "react-hot-toast";
 import api from "../../utils/api";
+
+const ALLOWED_TYPES = ["image/png", "image/jpeg"];
+const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+
+function formatSize(bytes) {
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 export default function AdminAddProductForm() {
 
@@ -21,10 +30,14 @@ export default function AdminAddProductForm() {
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
     const [labelledPrice, setLabelledPrice] = useState("");
-    const [image, setImage] = useState([]);
-    const [imagePreviews, setImagePreviews] = useState([]);
+
+    // Each item: { file, name, size, url }
+    const [imageItems, setImageItems] = useState([]);
+    const [activeIndex, setActiveIndex] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
     const imageInputRef = useRef(null);
-    const previewUrlsRef = useRef([]);
+    const itemsRef = useRef([]);
+
     const [isAvailable, setIsAvailable] = useState(true);
     const [category, setCategory] = useState("");
     const [stock, setStock] = useState(0);
@@ -35,9 +48,13 @@ export default function AdminAddProductForm() {
     const navigate = useNavigate();
 
     useEffect(() => {
+        itemsRef.current = imageItems;
+    }, [imageItems]);
+
+    useEffect(() => {
         return () => {
-            previewUrlsRef.current.forEach((url) => {
-                URL.revokeObjectURL(url);
+            itemsRef.current.forEach((item) => {
+                URL.revokeObjectURL(item.url);
             });
         };
     }, []);
@@ -63,9 +80,9 @@ export default function AdminAddProductForm() {
 
         const imageUploadPromises = [];
 
-        for (let i = 0; i < image.length; i++) {
+        for (let i = 0; i < imageItems.length; i++) {
             imageUploadPromises.push(
-                uploadMedia(image[i])
+                uploadMedia(imageItems[i].file)
             );
         }
 
@@ -136,34 +153,80 @@ export default function AdminAddProductForm() {
         }
     }
 
-    function handleImageChange(event) {
-        const selectedImages = Array.from(
-            event.target.files || []
-        ).filter((file) => file.type.startsWith("image/"));
+    // Validate + add new files (used by both click-to-choose and drag & drop)
+    function addFiles(fileList) {
 
-        previewUrlsRef.current.forEach((url) => {
-            URL.revokeObjectURL(url);
+        const files = Array.from(fileList || []);
+        const valid = [];
+
+        files.forEach((file) => {
+
+            if (!ALLOWED_TYPES.includes(file.type)) {
+                toast.error(`${file.name}: only PNG or JPG files are allowed`);
+                return;
+            }
+
+            if (file.size > MAX_SIZE) {
+                toast.error(`${file.name}: file is larger than 5 MB`);
+                return;
+            }
+
+            valid.push({
+                file,
+                name: file.name,
+                size: file.size,
+                url: URL.createObjectURL(file)
+            });
         });
 
-        const previewUrls = selectedImages.map((file) =>
-            URL.createObjectURL(file)
-        );
+        if (valid.length === 0) return;
 
-        previewUrlsRef.current = previewUrls;
-        setImage(selectedImages);
-        setImagePreviews(
-            selectedImages.map((file, index) => ({
-                name: file.name,
-                url: previewUrls[index]
-            }))
-        );
+        // show the first newly added image in the preview
+        setActiveIndex(imageItems.length);
+        setImageItems((prev) => [...prev, ...valid]);
+    }
+
+    function handleImageChange(event) {
+        addFiles(event.target.files);
         event.target.value = "";
     }
+
+    function handleDrop(event) {
+        event.preventDefault();
+        setIsDragging(false);
+        addFiles(event.dataTransfer.files);
+    }
+
+    function removeImage(index) {
+
+        URL.revokeObjectURL(imageItems[index].url);
+
+        const newLength = imageItems.length - 1;
+
+        setImageItems((prev) => prev.filter((_, i) => i !== index));
+        setActiveIndex((prev) =>
+            Math.max(0, Math.min(prev >= index ? prev - 1 : prev, newLength - 1))
+        );
+    }
+
+    function clearAllImages() {
+        imageItems.forEach((item) => URL.revokeObjectURL(item.url));
+        setImageItems([]);
+        setActiveIndex(0);
+    }
+
+    const activeItem = imageItems[activeIndex];
 
     return (
         <div className="flex h-full min-h-0 w-full flex-col p-2 md:p-4">
 
-            
+            <style>{`
+                @keyframes previewIn {
+                    from { opacity: 0; transform: scale(0.96); }
+                    to   { opacity: 1; transform: scale(1); }
+                }
+            `}</style>
+
             <div className="mb-8 shrink-0 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
 
                 <div>
@@ -177,8 +240,6 @@ export default function AdminAddProductForm() {
                     </p>
 
                 </div>
-
-
 
             </div>
 
@@ -383,7 +444,7 @@ export default function AdminAddProductForm() {
                     </section>
 
 
-                    {/* Product Images */}
+                    {/* Product Images: upload (left) + preview (right) */}
                     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
 
                         <SectionHeader
@@ -392,103 +453,188 @@ export default function AdminAddProductForm() {
                             description="Upload the images used for the product."
                         />
 
-                        <button
-                            type="button"
-                            onClick={() => imageInputRef.current?.click()}
-                            className="flex min-h-[180px] w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 px-6 text-center transition hover:border-accent hover:bg-blue-50/40"
-                        >
+                        <div className="grid gap-4 md:grid-cols-2">
 
-                            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 text-accent">
-                                <FiUploadCloud className="text-2xl" />
-                            </div>
+                            {/* LEFT: upload area */}
+                            <button
+                                type="button"
+                                onClick={() => imageInputRef.current?.click()}
+                                onDragOver={(e) => {
+                                    e.preventDefault();
+                                    setIsDragging(true);
+                                }}
+                                onDragLeave={() => setIsDragging(false)}
+                                onDrop={handleDrop}
+                                className={`flex min-h-[260px] w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 text-center transition-all duration-300
+                                    ${isDragging
+                                        ? "scale-[1.02] border-accent bg-blue-50"
+                                        : "border-slate-200 bg-slate-50 hover:border-accent hover:bg-blue-50/40"}`}
+                            >
 
-                            <span className="text-sm font-semibold text-slate-800">
-                                Choose Product Images
-                            </span>
-
-                            <span className="mt-1 text-xs text-slate-400">
-                                PNG or JPG
-                            </span>
-
-                        </button>
-
-                        <input
-                            ref={imageInputRef}
-                            multiple
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleImageChange}
-                        />
-
-
-                        {
-                            image.length > 0 && (
-
-                                <div className="mt-4">
-
-                                    <p className="mb-3 text-sm font-semibold text-accent">
-                                        {image.length} image
-                                        {image.length > 1 ? "s" : ""} selected
-                                    </p>
-
-                                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                                        {imagePreviews.map((preview, index) => (
-                                            <div
-                                                key={`${preview.url}-${preview.name}`}
-                                                className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50"
-                                            >
-                                                <img
-                                                    src={preview.url}
-                                                    alt={`Product preview ${index + 1}`}
-                                                    className="h-28 w-full object-cover"
-                                                />
-
-                                                <p className="truncate px-2 py-2 text-xs text-slate-500">
-                                                    {preview.name}
-                                                </p>
-                                            </div>
-                                        ))}
-                                    </div>
-
+                                <div
+                                    className={`mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 text-accent transition-transform duration-300
+                                        ${isDragging ? "-translate-y-1 scale-110" : ""}`}
+                                >
+                                    <FiUploadCloud className="text-2xl" />
                                 </div>
 
-                            )
-                        }
+                                <span className="text-sm font-semibold text-slate-800">
+                                    {isDragging ? "Drop images here" : "Choose Product Images"}
+                                </span>
+
+                                <span className="mt-1 text-xs text-slate-400">
+                                    Click or drag &amp; drop
+                                </span>
+
+                                <span className="mt-1 text-xs text-slate-400">
+                                    PNG or JPG, up to 5 MB each
+                                </span>
+
+                            </button>
+
+                            <input
+                                ref={imageInputRef}
+                                multiple
+                                type="file"
+                                accept="image/png,image/jpeg"
+                                className="hidden"
+                                onChange={handleImageChange}
+                            />
+
+
+                            {/* RIGHT: preview area */}
+                            <div className="flex min-h-[260px] flex-col rounded-2xl border border-slate-200 bg-slate-50 p-3">
+
+                                {activeItem ? (
+
+                                    <>
+                                        {/* Main preview */}
+                                        <div className="group relative flex-1 overflow-hidden rounded-xl bg-white">
+
+                                            <img
+                                                key={activeItem.url}
+                                                src={activeItem.url}
+                                                alt="Selected product preview"
+                                                style={{ animation: "previewIn 300ms ease-out" }}
+                                                className="h-full max-h-[260px] min-h-[180px] w-full object-cover"
+                                            />
+
+                                            <button
+                                                type="button"
+                                                onClick={() => removeImage(activeIndex)}
+                                                title="Remove image"
+                                                className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white opacity-100 transition hover:bg-red-600 md:opacity-0 md:group-hover:opacity-100"
+                                            >
+                                                <FiX />
+                                            </button>
+
+                                        </div>
+
+                                        {/* File info */}
+                                        <div className="mt-2 flex items-center justify-between gap-2 px-1">
+                                            <p className="truncate text-xs font-medium text-slate-600">
+                                                {activeItem.name}
+                                            </p>
+                                            <p className="shrink-0 text-xs text-slate-400">
+                                                {formatSize(activeItem.size)}
+                                            </p>
+                                        </div>
+
+                                        {/* Thumbnails (only when more than one image) */}
+                                        {imageItems.length > 1 && (
+                                            <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+                                                {imageItems.map((item, index) => (
+                                                    <button
+                                                        type="button"
+                                                        key={item.url}
+                                                        onClick={() => setActiveIndex(index)}
+                                                        className={`h-14 w-14 shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200
+                                                            ${index === activeIndex
+                                                                ? "border-accent shadow-md"
+                                                                : "border-transparent opacity-60 hover:opacity-100"}`}
+                                                    >
+                                                        <img
+                                                            src={item.url}
+                                                            alt={`Thumbnail ${index + 1}`}
+                                                            className="h-full w-full object-cover"
+                                                        />
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {/* Footer: count + clear all */}
+                                        <div className="mt-2 flex items-center justify-between px-1">
+                                            <p className="text-xs font-semibold text-accent">
+                                                {imageItems.length} image
+                                                {imageItems.length > 1 ? "s" : ""} selected
+                                            </p>
+
+                                            <button
+                                                type="button"
+                                                onClick={clearAllImages}
+                                                className="text-xs font-medium text-slate-400 transition hover:text-red-600"
+                                            >
+                                                Clear all
+                                            </button>
+                                        </div>
+                                    </>
+
+                                ) : (
+
+                                    /* Empty state */
+                                    <div className="flex flex-1 flex-col items-center justify-center text-center">
+
+                                        <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-2xl text-slate-300">
+                                            <FiImage />
+                                        </div>
+
+                                        <p className="text-sm font-semibold text-slate-500">
+                                            No image selected
+                                        </p>
+
+                                        <p className="mt-1 text-xs text-slate-400">
+                                            Your preview will appear here
+                                        </p>
+
+                                    </div>
+
+                                )}
+
+                            </div>
+
+                        </div>
 
                     </section>
 
-             <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+                    <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
 
-               
+                        <div className="flex items-center gap-3">
 
+                            <Link
+                                to="/admin/products"
+                                className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-600 shadow-sm transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                            >
+                                Cancel
+                            </Link>
 
-                <div className="flex items-center gap-3">
+                            <button
+                                disabled={isloading}
+                                onClick={addProduct}
+                                className="inline-flex items-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                                <FiSave />
 
-                    <Link
-                        to="/admin/products"
-                        className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-600 shadow-sm transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
-                    >
-                        Cancel
-                    </Link>
+                                {
+                                    isloading
+                                        ? "Saving..."
+                                        : "Save Product"
+                                }
+                            </button>
 
-                    <button
-                        disabled={isloading}
-                        onClick={addProduct}
-                        className="inline-flex items-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                        <FiSave />
+                        </div>
 
-                        {
-                            isloading
-                                ? "Saving..."
-                                : "Save Product"
-                        }
-                    </button>
-
-                </div>
-
-            </div>
+                    </div>
 
                 </div>
 
