@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
     FiBox,
@@ -22,7 +22,9 @@ export default function AdminAddProductForm() {
     const [price, setPrice] = useState("");
     const [labelledPrice, setLabelledPrice] = useState("");
     const [image, setImage] = useState([]);
-    const [imagePreviewUrls, setImagePreviewUrls] = useState([]);
+    const [imagePreviews, setImagePreviews] = useState([]);
+    const imageInputRef = useRef(null);
+    const previewUrlsRef = useRef([]);
     const [isAvailable, setIsAvailable] = useState(true);
     const [category, setCategory] = useState("");
     const [stock, setStock] = useState(0);
@@ -33,18 +35,12 @@ export default function AdminAddProductForm() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const previewUrls = image.map((file) =>
-            URL.createObjectURL(file)
-        );
-
-        setImagePreviewUrls(previewUrls);
-
         return () => {
-            previewUrls.forEach((url) => {
+            previewUrlsRef.current.forEach((url) => {
                 URL.revokeObjectURL(url);
             });
         };
-    }, [image]);
+    }, []);
 
     async function addProduct() {
 
@@ -138,6 +134,30 @@ export default function AdminAddProductForm() {
 
             setIsLoading(false);
         }
+    }
+
+    function handleImageChange(event) {
+        const selectedImages = Array.from(
+            event.target.files || []
+        ).filter((file) => file.type.startsWith("image/"));
+
+        previewUrlsRef.current.forEach((url) => {
+            URL.revokeObjectURL(url);
+        });
+
+        const previewUrls = selectedImages.map((file) =>
+            URL.createObjectURL(file)
+        );
+
+        previewUrlsRef.current = previewUrls;
+        setImage(selectedImages);
+        setImagePreviews(
+            selectedImages.map((file, index) => ({
+                name: file.name,
+                url: previewUrls[index]
+            }))
+        );
+        event.target.value = "";
     }
 
     return (
@@ -372,7 +392,11 @@ export default function AdminAddProductForm() {
                             description="Upload the images used for the product."
                         />
 
-                        <label className="flex min-h-[180px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 px-6 text-center transition hover:border-accent hover:bg-blue-50/40">
+                        <button
+                            type="button"
+                            onClick={() => imageInputRef.current?.click()}
+                            className="flex min-h-[180px] w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 px-6 text-center transition hover:border-accent hover:bg-blue-50/40"
+                        >
 
                             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 text-accent">
                                 <FiUploadCloud className="text-2xl" />
@@ -386,19 +410,16 @@ export default function AdminAddProductForm() {
                                 PNG or JPG
                             </span>
 
-                            <input
-                                multiple
-                                type="file"
-                                accept="image/*"
-                                className="sr-only"
-                                onChange={(e) => {
-                                    setImage(
-                                        Array.from(e.target.files)
-                                    );
-                                }}
-                            />
+                        </button>
 
-                        </label>
+                        <input
+                            ref={imageInputRef}
+                            multiple
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleImageChange}
+                        />
 
 
                         {
@@ -412,19 +433,19 @@ export default function AdminAddProductForm() {
                                     </p>
 
                                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                                        {imagePreviewUrls.map((previewUrl, index) => (
+                                        {imagePreviews.map((preview, index) => (
                                             <div
-                                                key={`${previewUrl}-${image[index].name}`}
+                                                key={`${preview.url}-${preview.name}`}
                                                 className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50"
                                             >
                                                 <img
-                                                    src={previewUrl}
+                                                    src={preview.url}
                                                     alt={`Product preview ${index + 1}`}
                                                     className="h-28 w-full object-cover"
                                                 />
 
                                                 <p className="truncate px-2 py-2 text-xs text-slate-500">
-                                                    {image[index].name}
+                                                    {preview.name}
                                                 </p>
                                             </div>
                                         ))}
