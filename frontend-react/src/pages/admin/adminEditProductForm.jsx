@@ -1,8 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import uploadMedia from "../../utils/mediaUpload";
 import api from "../../utils/api";
+
+const ALLOWED_TYPES = ["image/png", "image/jpeg"];
+const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+
+function formatSize(bytes) {
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 const inputClass =
     "w-full h-11 px-3 rounded-lg border border-gray-300 bg-white text-gray-800 " +
@@ -44,23 +52,95 @@ export default function AdminEditProductForm() {
     const [description, setDescription] = useState(location.state.description);
     const [price, setPrice] = useState(location.state.price);
     const [labelledPrice, setLabelledPrice] = useState(location.state.labelledPrice);
-    const [image, setImage] = useState([]);
     const [isAvailable, setIsAvailable] = useState(location.state.isAvailable);
     const [category, setCategory] = useState(location.state.category);
     const [stock, setStock] = useState(location.state.stock);
     const [brand, setBrand] = useState(location.state.brand);
     const [model, setModel] = useState(location.state.model);
     const [isloading, setIsLoading] = useState(false);
-    const [newPreviews, setNewPreviews] = useState([]);
 
-    // Preview newly selected images
+    // Newly selected images. Each item: { file, name, size, url }
+    const [newItems, setNewItems] = useState([]);
+    const [activeIndex, setActiveIndex] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const newItemsRef = useRef([]);
+
+    // keep a ref of the latest items so we can clean up on unmount
     useEffect(() => {
-        const urls = Array.from(image).map((file) => URL.createObjectURL(file));
-        setNewPreviews(urls);
-        return () => urls.forEach((url) => URL.revokeObjectURL(url));
-    }, [image]);
+        newItemsRef.current = newItems;
+    }, [newItems]);
 
-    const currentImages = newPreviews.length > 0 ? newPreviews : location.state.image || [];
+    useEffect(() => {
+        return () => {
+            newItemsRef.current.forEach((item) => URL.revokeObjectURL(item.url));
+        };
+    }, []);
+
+    // Current images saved on the product
+    const currentItems = (location.state.image || []).map((src, index) => ({
+        url: src,
+        name: `Image ${index + 1}`,
+    }));
+
+    const showingNew = newItems.length > 0;
+    const displayItems = showingNew ? newItems : currentItems;
+    const safeIndex = Math.min(activeIndex, Math.max(displayItems.length - 1, 0));
+    const activeItem = displayItems[safeIndex];
+
+    // Validate + add new files (used by both click-to-choose and drag & drop)
+    function addFiles(fileList) {
+        const files = Array.from(fileList || []);
+        const valid = [];
+
+        files.forEach((file) => {
+            if (!ALLOWED_TYPES.includes(file.type)) {
+                toast.error(`${file.name}: only PNG or JPG files are allowed`);
+                return;
+            }
+
+            if (file.size > MAX_SIZE) {
+                toast.error(`${file.name}: file is larger than 5 MB`);
+                return;
+            }
+
+            valid.push({
+                file,
+                name: file.name,
+                size: file.size,
+                url: URL.createObjectURL(file),
+            });
+        });
+
+        if (valid.length === 0) return;
+
+        // show the first newly added image in the preview
+        setActiveIndex(newItems.length);
+        setNewItems((prev) => [...prev, ...valid]);
+    }
+
+    function handleImageChange(event) {
+        addFiles(event.target.files);
+        event.target.value = "";
+    }
+
+    function handleDrop(event) {
+        event.preventDefault();
+        setIsDragging(false);
+        addFiles(event.dataTransfer.files);
+    }
+
+    function removeNewImage(index) {
+        URL.revokeObjectURL(newItems[index].url);
+        setNewItems((prev) => prev.filter((_, i) => i !== index));
+        setActiveIndex(0);
+    }
+
+    // Discard all new images and go back to showing the current ones
+    function discardNewImages() {
+        newItems.forEach((item) => URL.revokeObjectURL(item.url));
+        setNewItems([]);
+        setActiveIndex(0);
+    }
 
     async function editProduct() {
         setIsLoading(true);
@@ -77,12 +157,13 @@ export default function AdminEditProductForm() {
         try {
             const imageUploadPromises = [];
 
-            for (let i = 0; i < image.length; i++) {
-                imageUploadPromises.push(uploadMedia(image[i]));
+            for (let i = 0; i < newItems.length; i++) {
+                imageUploadPromises.push(uploadMedia(newItems[i].file));
             }
 
             let imageUrls = await Promise.all(imageUploadPromises);
 
+            // no new images selected: keep the current ones
             if (imageUrls.length == 0) {
                 imageUrls = location.state.image;
             }
@@ -121,6 +202,13 @@ export default function AdminEditProductForm() {
 
     return (
         <div className="w-full h-full flex flex-col gap-5 overflow-y-auto pb-6">
+            <style>{`
+                @keyframes previewIn {
+                    from { opacity: 0; transform: scale(0.96); }
+                    to   { opacity: 1; transform: scale(1); }
+                }
+            `}</style>
+
             {/* Header */}
             <div className="sticky top-0 z-10 w-full bg-white/90 backdrop-blur shadow-lg rounded-xl px-6 py-4 flex items-center justify-between">
                 <div>
@@ -293,35 +381,152 @@ export default function AdminEditProductForm() {
                 </Field>
             </Card>
 
-            {/* Images */}
+            {/* Images: upload (left) + preview (right) */}
             <Card title="Images" subtitle="Upload new images to replace the current ones">
-                <Field label="Upload images" className="md:col-span-6">
-                    <label
-                        className="flex flex-col items-center justify-center gap-1 h-28 rounded-lg border-2 border-dashed border-gray-300
-                                   text-gray-500 cursor-pointer transition-all duration-200
-                                   hover:border-blue-500 hover:bg-blue-50 hover:text-blue-600"
-                    >
-                        <span className="font-medium">Click to choose images</span>
-                        <span className="text-xs">
-                            {image.length > 0 ? `${image.length} new file(s) selected` : "Leave empty to keep current images"}
-                        </span>
-                        <input multiple={true} onChange={(e) => setImage(e.target.files)} type="file" accept="image/*" className="hidden" />
-                    </label>
-                </Field>
+                <div className="md:col-span-6 grid gap-4 md:grid-cols-2">
 
-                {currentImages.length > 0 && (
-                    <div className="md:col-span-6 flex flex-wrap gap-3">
-                        {currentImages.map((src, index) => (
-                            <img
-                                key={index}
-                                src={src}
-                                alt={`Product ${index + 1}`}
-                                className="w-24 h-24 object-cover rounded-lg border border-gray-200 shadow-sm
-                                           transition-transform duration-300 hover:scale-110 hover:shadow-md"
-                            />
-                        ))}
+                    {/* LEFT: upload area */}
+                    <label
+                        onDragOver={(e) => {
+                            e.preventDefault();
+                            setIsDragging(true);
+                        }}
+                        onDragLeave={() => setIsDragging(false)}
+                        onDrop={handleDrop}
+                        className={`flex min-h-[280px] flex-col items-center justify-center gap-1 rounded-2xl border-2 border-dashed
+                                    px-6 text-center cursor-pointer transition-all duration-300
+                                    ${isDragging
+                                ? "scale-[1.02] border-blue-500 bg-blue-50 text-blue-600"
+                                : "border-gray-300 bg-gray-50 text-gray-500 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-600"}`}
+                    >
+                        <div
+                            className={`mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 text-2xl text-blue-600
+                                        transition-transform duration-300 ${isDragging ? "-translate-y-1 scale-110" : ""}`}
+                        >
+                            ⬆
+                        </div>
+
+                        <span className="font-medium">
+                            {isDragging ? "Drop images here" : "Click to choose images"}
+                        </span>
+                        <span className="text-xs">or drag &amp; drop them here</span>
+                        <span className="text-xs">PNG or JPG, up to 5 MB each</span>
+                        <span className="mt-2 text-xs text-gray-400">
+                            {showingNew
+                                ? `${newItems.length} new file(s) selected`
+                                : "Leave empty to keep current images"}
+                        </span>
+
+                        <input
+                            multiple
+                            type="file"
+                            accept="image/png,image/jpeg"
+                            className="hidden"
+                            onChange={handleImageChange}
+                        />
+                    </label>
+
+                    {/* RIGHT: preview area */}
+                    <div className="flex min-h-[280px] flex-col rounded-2xl border border-gray-200 bg-gray-50 p-3">
+
+                        {activeItem ? (
+                            <>
+                                {/* Main preview */}
+                                <div className="group relative flex-1 overflow-hidden rounded-xl bg-white">
+                                    <img
+                                        key={activeItem.url}
+                                        src={activeItem.url}
+                                        alt="Product preview"
+                                        style={{ animation: "previewIn 300ms ease-out" }}
+                                        className="h-full max-h-[280px] min-h-[190px] w-full object-cover"
+                                    />
+
+                                    {/* Current / New badge */}
+                                    <span
+                                        className={`absolute left-2 top-2 rounded-full px-3 py-1 text-xs font-semibold shadow
+                                                    ${showingNew ? "bg-green-500 text-white" : "bg-white/90 text-gray-600"}`}
+                                    >
+                                        {showingNew ? "New" : "Current"}
+                                    </span>
+
+                                    {/* Remove button (only for new images) */}
+                                    {showingNew && (
+                                        <button
+                                            type="button"
+                                            onClick={() => removeNewImage(safeIndex)}
+                                            title="Remove image"
+                                            className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full
+                                                       bg-black/60 text-white opacity-100 transition hover:bg-red-600
+                                                       md:opacity-0 md:group-hover:opacity-100"
+                                        >
+                                            ✕
+                                        </button>
+                                    )}
+                                </div>
+
+                                {/* File info (new images only) */}
+                                {showingNew && (
+                                    <div className="mt-2 flex items-center justify-between gap-2 px-1">
+                                        <p className="truncate text-xs font-medium text-gray-600">{activeItem.name}</p>
+                                        <p className="shrink-0 text-xs text-gray-400">{formatSize(activeItem.size)}</p>
+                                    </div>
+                                )}
+
+                                {/* Thumbnails (only when more than one image) */}
+                                {displayItems.length > 1 && (
+                                    <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+                                        {displayItems.map((item, index) => (
+                                            <button
+                                                type="button"
+                                                key={`${item.url}-${index}`}
+                                                onClick={() => setActiveIndex(index)}
+                                                className={`h-14 w-14 shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200
+                                                    ${index === safeIndex
+                                                        ? "border-blue-500 shadow-md"
+                                                        : "border-transparent opacity-60 hover:opacity-100"}`}
+                                            >
+                                                <img
+                                                    src={item.url}
+                                                    alt={`Thumbnail ${index + 1}`}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Footer */}
+                                <div className="mt-2 flex items-center justify-between gap-2 px-1">
+                                    <p className={`text-xs font-semibold ${showingNew ? "text-green-600" : "text-blue-600"}`}>
+                                        {showingNew
+                                            ? `${newItems.length} new image${newItems.length > 1 ? "s" : ""} (will replace current images on save)`
+                                            : `${currentItems.length} current image${currentItems.length > 1 ? "s" : ""}`}
+                                    </p>
+
+                                    {showingNew && (
+                                        <button
+                                            type="button"
+                                            onClick={discardNewImages}
+                                            className="shrink-0 text-xs font-medium text-gray-400 transition hover:text-red-600"
+                                        >
+                                            Discard new
+                                        </button>
+                                    )}
+                                </div>
+                            </>
+                        ) : (
+                            /* Empty state: no current and no new images */
+                            <div className="flex flex-1 flex-col items-center justify-center text-center">
+                                <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 text-2xl text-gray-300">
+                                    🖼
+                                </div>
+                                <p className="text-sm font-semibold text-gray-500">No image</p>
+                                <p className="mt-1 text-xs text-gray-400">Your preview will appear here</p>
+                            </div>
+                        )}
                     </div>
-                )}
+
+                </div>
             </Card>
         </div>
     );
