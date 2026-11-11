@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import api from "../utils/api.js";
 import LoadingScreen from "../components/loadingScreen.jsx";
 import ProductCard from "../components/productCard.jsx";
 import CategorySidebar from "../components/CategorySidebar.jsx";
+import ProductSearchBar from "../components/ProductSearchBar.jsx";
 
 export default function ProductsPage() {
 
@@ -12,6 +13,9 @@ export default function ProductsPage() {
     const [query, setQuery] = useState("");
     const [searching, setSearching] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("All");
+
+    // Used to ignore old responses when a newer search or a clear happens
+    const requestId = useRef(0);
 
     function loadProducts() {
         setLoading(true);
@@ -34,22 +38,35 @@ export default function ProductsPage() {
 
     function searchProducts() {
 
-        if (query.trim() === "") {
-            loadProducts();
+        const text = query.trim();
+        const id = ++requestId.current;
+
+        // empty search: show the full list again, no request needed
+        if (text === "") {
+            setProducts(allProducts);
+            setSearching(false);
             return;
         }
 
         setSearching(true);
-        api.get("/products/search/" + encodeURIComponent(query.trim()))
+        api.get("/products/search/" + encodeURIComponent(text))
             .then((response) => {
-                setProducts(response.data);
-                setSearching(false);
+                if (id === requestId.current) setProducts(response.data);
             })
             .catch((error) => {
                 console.error("Error searching products:", error);
-                setSearching(false);
+            })
+            .finally(() => {
+                if (id === requestId.current) setSearching(false);
             });
 
+    }
+
+    function clearSearch() {
+        requestId.current++;
+        setQuery("");
+        setSearching(false);
+        setProducts(allProducts);
     }
 
     const categories = [...new Set(allProducts.map((p) => p.category).filter(Boolean))];
@@ -62,7 +79,6 @@ export default function ProductsPage() {
         <div className="flex min-h-screen w-full flex-col bg-primary lg:flex-row">
 
             {loading && <LoadingScreen />}
-            {searching && <LoadingScreen />}
 
             {/* Left navigation sidebar */}
             <CategorySidebar
@@ -73,22 +89,16 @@ export default function ProductsPage() {
             />
 
             {/* Main content */}
-            <main className="min-w-0 flex-1 px-4 py-10 lg:px-10">
+            <main className="min-w-0 flex-1 px-4 pb-28 pt-10 lg:px-10 lg:pb-10">
 
                 {/* Search bar */}
-                <div className="mb-8 flex w-full flex-wrap items-center justify-center gap-3">
-                    <input
-                        type="text"
-                        placeholder="Search products..."
-                        className="h-[40px] w-full rounded-md border border-black p-2 sm:w-[400px]"
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter") searchProducts();
-                        }}
-                    />
-                    
-                </div>
+                <ProductSearchBar
+                    value={query}
+                    onChange={setQuery}
+                    onSearch={searchProducts}
+                    onClear={clearSearch}
+                    searching={searching}
+                />
 
                 {/* Products */}
                 {!loading && (
