@@ -5,7 +5,7 @@ export default function ProductSearchBar({ value, onChange, onSearch, onClear, s
 
     const inputRef = useRef(null);
 
-    // Press "/" anywhere on the page to jump to the search bar
+    
     useEffect(() => {
         function onKey(e) {
             const tag = e.target.tagName;
@@ -71,14 +71,14 @@ export default function ProductSearchBar({ value, onChange, onSearch, onClear, s
                 )}
 
                 {/* Shortcut hint (desktop only, hidden while focused or typing) */}
-                {!value && (
+                {/* {!value && (
                     <kbd
                         className="hidden rounded-md border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs text-gray-400
                                    transition-opacity duration-200 group-focus-within:opacity-0 sm:block"
                     >
                         /
                     </kbd>
-                )}
+                )} */}
 
                 {/* Search button with inline spinner */}
                 <button
