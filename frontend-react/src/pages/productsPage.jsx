@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import api from "../utils/api.js";
 import LoadingScreen from "../components/loadingScreen.jsx";
 import ProductCard from "../components/productCard.jsx";
@@ -7,12 +8,15 @@ import ProductSearchBar from "../components/ProductSearchBar.jsx";
 
 export default function ProductsPage() {
 
+    const [searchParams] = useSearchParams();
+    const categoryFromUrl = searchParams.get("category") || "All";
+
     const [products, setProducts] = useState([]);
     const [allProducts, setAllProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [query, setQuery] = useState("");
     const [searching, setSearching] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState("All");
+    const [selectedCategory, setSelectedCategory] = useState(categoryFromUrl);
 
     // Used to ignore old responses when a newer search or a clear happens
     const requestId = useRef(0);
@@ -35,6 +39,12 @@ export default function ProductsPage() {
     useEffect(() => {
         loadProducts();
     }, []);
+
+    // Keep the selected category in sync when the URL changes
+    // (for example clicking "Products" in the navbar while on /products?category=ram)
+    useEffect(() => {
+        setSelectedCategory(categoryFromUrl);
+    }, [categoryFromUrl]);
 
     function searchProducts() {
 
@@ -71,8 +81,14 @@ export default function ProductsPage() {
 
     const categories = [...new Set(allProducts.map((p) => p.category).filter(Boolean))];
 
+    // An unknown category in the URL falls back to "All"
+    const activeCategory =
+        selectedCategory === "All" || categories.includes(selectedCategory)
+            ? selectedCategory
+            : "All";
+
     const visibleProducts = products.filter(
-        (p) => selectedCategory === "All" || p.category === selectedCategory
+        (p) => activeCategory === "All" || p.category === activeCategory
     );
 
     return (
@@ -84,7 +100,7 @@ export default function ProductsPage() {
             <CategorySidebar
                 categories={categories}
                 products={products}
-                selected={selectedCategory}
+                selected={activeCategory}
                 onSelect={setSelectedCategory}
             />
 
