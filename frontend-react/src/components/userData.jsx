@@ -106,44 +106,6 @@ export default function UserData() {
         };
     }, []);
 
-    // Close menu with Escape and support arrow-key navigation
-    function handleMenuKeyDown(event) {
-        const menuItems = menuRef.current?.querySelectorAll(
-            '[role="menuitem"]:not([disabled])'
-        );
-
-        if (!menuItems?.length) return;
-
-        const items = Array.from(menuItems);
-        const currentIndex = items.indexOf(document.activeElement);
-
-        if (event.key === "Escape") {
-            event.preventDefault();
-            setIsMenuOpen(false);
-            triggerRef.current?.focus();
-        }
-
-        if (event.key === "ArrowDown") {
-            event.preventDefault();
-            items[(currentIndex + 1) % items.length].focus();
-        }
-
-        if (event.key === "ArrowUp") {
-            event.preventDefault();
-            items[(currentIndex - 1 + items.length) % items.length].focus();
-        }
-
-        if (event.key === "Home") {
-            event.preventDefault();
-            items[0].focus();
-        }
-
-        if (event.key === "End") {
-            event.preventDefault();
-            items[items.length - 1].focus();
-        }
-    }
-
     function openMenu() {
         setIsMenuOpen((previous) => !previous);
     }
@@ -286,7 +248,6 @@ export default function UserData() {
                         }`}
                     role="menu"
                     aria-label="User account menu"
-                    onKeyDown={handleMenuKeyDown}
                     aria-hidden={!isMenuOpen}
                 >
 
