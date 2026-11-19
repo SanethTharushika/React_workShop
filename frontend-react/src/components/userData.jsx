@@ -266,26 +266,24 @@ export default function UserData() {
 
                     <FiChevronDown
                         className={`hidden text-white/80 transition-transform
-                        duration-200 lg:block ${
-                            isMenuOpen ? "rotate-180" : ""
-                        }`}
+                        duration-200 lg:block ${isMenuOpen ? "rotate-180" : ""
+                            }`}
                     />
                 </button>
 
                 {/* Dropdown Menu */}
                 <div
-                    className={`absolute bottom-full right-0 z-50 mb-3
+                    className={`fixed bottom-20 right-3 z-50
                     w-[min(20rem,calc(100vw-2rem))]
                     origin-bottom-right rounded-2xl border border-gray-100
                     bg-white p-2 text-gray-800 shadow-2xl
                     transition-all duration-200 ease-out
-                    lg:bottom-auto lg:top-full lg:mt-3 lg:mb-0
-                    lg:origin-top-right
-                    ${
-                        isMenuOpen
+                    lg:absolute lg:right-0 lg:top-full lg:bottom-auto
+                    lg:mt-3 lg:origin-top-right
+                    ${isMenuOpen
                             ? "visible translate-y-0 scale-100 opacity-100"
                             : "invisible translate-y-2 scale-95 opacity-0 pointer-events-none"
-                    }`}
+                        }`}
                     role="menu"
                     aria-label="User account menu"
                     onKeyDown={handleMenuKeyDown}
