@@ -1,6 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
+import { FiX } from "react-icons/fi";
 import api from "../utils/api.js";
+import { getFormattedPrice } from "../utils/price-formatter.jsx";
 import LoadingScreen from "../components/loadingScreen.jsx";
 import ProductCard from "../components/productCard.jsx";
 import CategorySidebar from "../components/CategorySidebar.jsx";
@@ -17,6 +19,9 @@ export default function ProductsPage() {
     const [query, setQuery] = useState("");
     const [searching, setSearching] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(categoryFromUrl);
+
+    // null = no price filter, otherwise [min, max]
+    const [priceRange, setPriceRange] = useState(null);
 
     // Used to ignore old responses when a newer search or a clear happens
     const requestId = useRef(0);
@@ -41,7 +46,6 @@ export default function ProductsPage() {
     }, []);
 
     // Keep the selected category in sync when the URL changes
-    // (for example clicking "Products" in the navbar while on /products?category=ram)
     useEffect(() => {
         setSelectedCategory(categoryFromUrl);
     }, [categoryFromUrl]);
@@ -81,13 +85,41 @@ export default function ProductsPage() {
 
     const categories = [...new Set(allProducts.map((p) => p.category).filter(Boolean))];
 
+    // Slider limits come from the full product list, so they don't shrink after a search
+    const priceBounds = useMemo(() => {
+        const prices = allProducts
+            .map((p) => Number(p.price))
+            .filter((n) => Number.isFinite(n) && n >= 0);
+
+        if (prices.length === 0) return { min: 0, max: 0, step: 1 };
+
+        const rawMin = Math.min(...prices);
+        const rawMax = Math.max(...prices);
+        const span = rawMax - rawMin;
+        const step = span >= 100000 ? 1000 : span >= 10000 ? 100 : span >= 1000 ? 10 : 1;
+
+        return {
+            min: Math.floor(rawMin / step) * step,
+            max: Math.ceil(rawMax / step) * step,
+            step,
+        };
+    }, [allProducts]);
+
     // An unknown category in the URL falls back to "All"
     const activeCategory =
         selectedCategory === "All" || categories.includes(selectedCategory)
             ? selectedCategory
             : "All";
 
-    const visibleProducts = products.filter(
+    // 1) search results  ->  2) price range  ->  3) category
+    const priceFiltered = priceRange
+        ? products.filter((p) => {
+            const price = Number(p.price);
+            return price >= priceRange[0] && price <= priceRange[1];
+        })
+        : products;
+
+    const visibleProducts = priceFiltered.filter(
         (p) => activeCategory === "All" || p.category === activeCategory
     );
 
@@ -96,12 +128,15 @@ export default function ProductsPage() {
 
             {loading && <LoadingScreen />}
 
-            {/* Left navigation sidebar */}
+            {/* Left navigation sidebar (category counts follow the price range) */}
             <CategorySidebar
                 categories={categories}
-                products={products}
+                products={priceFiltered}
                 selected={activeCategory}
                 onSelect={setSelectedCategory}
+                priceBounds={priceBounds}
+                priceRange={priceRange}
+                onPriceChange={setPriceRange}
             />
 
             {/* Main content */}
@@ -116,6 +151,23 @@ export default function ProductsPage() {
                     searching={searching}
                 />
 
+                {/* Active price filter chip */}
+                {priceRange && (
+                    <div className="mb-6 flex justify-center">
+                        <button
+                            type="button"
+                            onClick={() => setPriceRange(null)}
+                            title="Clear price range"
+                            className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-sm
+                                       font-medium text-accent shadow-md transition-all duration-200
+                                       hover:shadow-lg active:scale-95"
+                        >
+                            Price: {getFormattedPrice(priceRange[0])} – {getFormattedPrice(priceRange[1])}
+                            <FiX />
+                        </button>
+                    </div>
+                )}
+
                 {/* Products */}
                 {!loading && (
                     <div className="flex flex-wrap content-start justify-center gap-6">
@@ -127,9 +179,24 @@ export default function ProductsPage() {
                                 />
                             ))
                         ) : (
-                            <p className="w-full py-20 text-center text-gray-500">
-                                No products found.
-                            </p>
+                            <div className="w-full py-20 text-center text-gray-500">
+                                <p>
+                                    {priceRange
+                                        ? "No products found in this price range."
+                                        : "No products found."}
+                                </p>
+
+                                {priceRange && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setPriceRange(null)}
+                                        className="mt-4 rounded-lg bg-accent px-5 py-2 text-sm font-medium text-white
+                                                   transition-all duration-200 hover:brightness-110 active:scale-95"
+                                    >
+                                        Reset price range
+                                    </button>
+                                )}
+                            </div>
                         )}
                     </div>
                 )}
