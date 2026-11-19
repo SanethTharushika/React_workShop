@@ -1,9 +1,18 @@
 import { useState } from "react";
+import PriceRangeFilter from "./PriceRangeFilter.jsx";
 
 const ITEM_H = 44; // height of each category row (px)
 const GAP = 4;     // space between rows (px)
 
-export default function CategorySidebar({ categories, products, selected, onSelect }) {
+export default function CategorySidebar({
+    categories,
+    products,
+    selected,
+    onSelect,
+    priceBounds,
+    priceRange,
+    onPriceChange,
+}) {
     const [open, setOpen] = useState(false);
 
     const items = ["All", ...categories];
@@ -79,6 +88,14 @@ export default function CategorySidebar({ categories, products, selected, onSele
         </div>
     );
 
+    // Price range section (only when the products have different prices)
+    const priceSection =
+        priceBounds && priceBounds.max > priceBounds.min ? (
+            <div className="mt-8 border-t border-white/15 pt-6">
+                <PriceRangeFilter bounds={priceBounds} value={priceRange} onChange={onPriceChange} />
+            </div>
+        ) : null;
+
     return (
         <>
             <style>{`
@@ -99,15 +116,16 @@ export default function CategorySidebar({ categories, products, selected, onSele
                 className="m-4 self-start rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white
                            transition-all duration-200 hover:brightness-110 active:scale-95 lg:hidden"
             >
-                ☰ Categories
+                ☰ Categories &amp; Filters
             </button>
 
             {/* Desktop sidebar */}
             <aside className="sticky top-0 hidden h-screen w-64 shrink-0 overflow-y-auto bg-accent p-4 shadow-xl lg:block">
-                <h3 className="mb-5 px-4 pt-2 text-m font-semibold uppercase tracking-widest text-white">
+                <h3 className="mb-5 px-4 pt-2 text-xs font-semibold uppercase tracking-widest text-white/50">
                     Categories
                 </h3>
                 {list}
+                {priceSection}
             </aside>
 
             {/* Mobile drawer */}
@@ -120,7 +138,7 @@ export default function CategorySidebar({ categories, products, selected, onSele
                                 ${open ? "opacity-100" : "opacity-0"}`}
                 />
                 <div
-                    className={`absolute left-0 top-0 h-full w-72 bg-accent p-4 shadow-2xl
+                    className={`absolute left-0 top-0 h-full w-72 overflow-y-auto bg-accent p-4 shadow-2xl
                                 transition-transform duration-300
                                 ${open ? "translate-x-0" : "-translate-x-full"}`}
                     style={{ transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)" }}
@@ -136,8 +154,9 @@ export default function CategorySidebar({ categories, products, selected, onSele
                             ✕
                         </button>
                     </div>
-                    {/* key makes the staggered entrance replay every time the drawer opens */}
-                    <div key={String(open)}>{list}</div>
+                    {list}
+                    {priceSection}
+                    <div className="h-8" />
                 </div>
             </div>
         </>
