@@ -1,161 +1,382 @@
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+    FiUser,
+    FiSettings,
+    FiPackage,
+    FiLogOut,
+    FiShield,
+    FiChevronDown,
+    FiX
+} from "react-icons/fi";
 import api from "../utils/api.js";
 import toast from "react-hot-toast";
-import { CiLogin } from "react-icons/ci";
 import LogoutConfirmModal from "./LogoutConfirmModal.jsx";
 
-
-
-/* ---------- UserData ---------- */
 export default function UserData() {
-
     const [user, setUser] = useState(null);
-    const [selectedOption, setSelectedOption] = useState("me");
+    const [isLoading, setIsLoading] = useState(true);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+    const [imageFailed, setImageFailed] = useState(false);
+
+    const menuRef = useRef(null);
+    const triggerRef = useRef(null);
 
     const navigate = useNavigate();
 
-    useEffect(() => {
-
+    // Fetch the currently logged-in user
+    const fetchUser = useCallback(async () => {
         const token = localStorage.getItem("token");
 
-        if (token != null) {
+        if (!token) {
+            setUser(null);
+            setIsLoading(false);
+            return;
+        }
 
-            api.get("/users/me", {
+        setIsLoading(true);
+
+        try {
+            const response = await api.get("/users/me", {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
-            })
-                .then((response) => {
-                    setUser(response.data);
-                })
-                .catch((error) => {
-                    console.error("Failed to load user data:", error);
-                    setUser(null);
-                });
+            });
 
+            setUser(response.data);
+            setImageFailed(false);
+
+        } catch (error) {
+            console.error("Failed to load user data:", error);
+
+            if (error.response?.status === 401) {
+                localStorage.removeItem("token");
+            }
+
+            setUser(null);
+
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    // Load user and listen for authentication changes
+    useEffect(() => {
+        fetchUser();
+
+        const handleAuthChange = () => {
+            setIsMenuOpen(false);
+            fetchUser();
+        };
+
+        const handleStorageChange = (event) => {
+            if (event.key === "token") {
+                handleAuthChange();
+            }
+        };
+
+        window.addEventListener("auth-changed", handleAuthChange);
+        window.addEventListener("storage", handleStorageChange);
+
+        return () => {
+            window.removeEventListener("auth-changed", handleAuthChange);
+            window.removeEventListener("storage", handleStorageChange);
+        };
+    }, [fetchUser]);
+
+    // Close menu when clicking outside
+    useEffect(() => {
+        function handleOutsideClick(event) {
+            if (
+                menuRef.current &&
+                !menuRef.current.contains(event.target)
+            ) {
+                setIsMenuOpen(false);
+            }
         }
 
+        document.addEventListener("mousedown", handleOutsideClick);
+        document.addEventListener("touchstart", handleOutsideClick);
+
+        return () => {
+            document.removeEventListener("mousedown", handleOutsideClick);
+            document.removeEventListener("touchstart", handleOutsideClick);
+        };
     }, []);
+
+    function openMenu() {
+        setIsMenuOpen((previous) => !previous);
+    }
+
+    function closeMenu() {
+        setIsMenuOpen(false);
+    }
 
     function confirmLogout() {
         localStorage.removeItem("token");
+
         setUser(null);
+        setIsMenuOpen(false);
         setShowLogoutConfirm(false);
+
+        window.dispatchEvent(new Event("auth-changed"));
+
         toast.success("Logged out successfully");
+
         navigate("/");
+    }
+
+    // User information
+    const fullName = user
+        ? `${user.firstName || ""} ${user.lastName || ""}`.trim() || "User"
+        : "";
+
+    const initials = fullName
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0].toUpperCase())
+        .join("");
+
+    const isAdmin =
+        user?.role?.toLowerCase() === "admin" ||
+        user?.isAdmin === true;
+
+    // Loading skeleton
+    if (isLoading) {
+        return (
+            <div className="flex items-center gap-2" aria-label="Loading user">
+                <div className="h-9 w-9 animate-pulse rounded-full bg-white/20" />
+                <div className="hidden h-3 w-20 animate-pulse rounded bg-white/20 lg:block" />
+            </div>
+        );
+    }
+
+    // Logged-out state
+    if (!user) {
+        return (
+            <div className="flex items-center gap-2">
+                <Link
+                    to="/signin"
+                    className="rounded-full border border-white/70 px-4 py-2
+                    text-xs font-semibold text-white transition-all duration-300
+                    hover:bg-white/10 focus-visible:outline-none
+                    focus-visible:ring-2 focus-visible:ring-white lg:px-5 lg:text-sm"
+                >
+                    Login
+                </Link>
+
+                <Link
+                    to="/signup"
+                    className="rounded-full bg-white px-4 py-2
+                    text-xs font-semibold text-accent shadow-md
+                    transition-all duration-300 hover:-translate-y-0.5
+                    hover:shadow-lg active:scale-95
+                    focus-visible:outline-none focus-visible:ring-2
+                    focus-visible:ring-white lg:px-5 lg:text-sm"
+                >
+                    Register
+                </Link>
+            </div>
+        );
     }
 
     return (
         <>
-            {
-                user == null ? (
+            <div className="relative" ref={menuRef}>
 
-                    <div className="flex items-center">
+                {/* Avatar Dropdown Trigger */}
+                <button
+                    ref={triggerRef}
+                    type="button"
+                    onClick={openMenu}
+                    aria-haspopup="menu"
+                    aria-expanded={isMenuOpen}
+                    aria-label={`User menu for ${fullName}`}
+                    className="group flex items-center gap-2 rounded-full
+                    px-2 py-1.5 text-white transition-all duration-200
+                    hover:bg-white/10 focus-visible:outline-none
+                    focus-visible:ring-2 focus-visible:ring-white"
+                >
+                    {/* Avatar */}
+                    <div className="flex h-9 w-9 shrink-0 items-center
+                    justify-center overflow-hidden rounded-full
+                    border-2 border-white/40 bg-indigo-500
+                    text-sm font-bold text-white shadow-md">
 
-                        {/* Desktop */}
-                        <div className="hidden lg:flex items-center gap-3">
-                            <Link
-                                to="/signin"
-                                className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white shadow-md
-                       transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg
-                       hover:shadow-accent/40 hover:brightness-110 active:scale-95"                            >
-                                Login
-                                <span className="absolute bottom-1 left-3 right-3 h-0.5 origin-left scale-x-0 rounded-full bg-accent transition-transform duration-300 group-hover:scale-x-100" />
-                            </Link>
+                        {user.image && !imageFailed ? (
+                            <img
+                                src={user.image}
+                                alt={`${fullName}'s profile`}
+                                className="h-full w-full object-cover"
+                                onError={() => setImageFailed(true)}
+                            />
+                        ) : (
+                            <span aria-label={`${fullName} initials`}>
+                                {initials || "U"}
+                            </span>
+                        )}
+                    </div>
 
-                            <Link
-                                to="/signup"
-                                className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white shadow-md
-                       transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg
-                       hover:shadow-accent/40 hover:brightness-110 active:scale-95"
-                            >
-                                Register
-                            </Link>
+                    {/* Desktop Name */}
+                    <span className="hidden max-w-32 truncate text-sm
+                    font-semibold lg:block">
+                        {user.firstName || "My Account"}
+                    </span>
+
+                    <FiChevronDown
+                        className={`hidden text-white/80 transition-transform
+                        duration-200 lg:block ${isMenuOpen ? "rotate-180" : ""
+                            }`}
+                    />
+                </button>
+
+                {/* Dropdown Menu */}
+                <div
+                    className={`fixed bottom-20 right-3 z-50
+                    w-[min(20rem,calc(100vw-2rem))]
+                    origin-bottom-right rounded-2xl border border-gray-100
+                    bg-white p-2 text-gray-800 shadow-2xl
+                    transition-all duration-200 ease-out
+                    lg:absolute lg:right-0 lg:top-full lg:bottom-auto
+                    lg:mt-3 lg:origin-top-right
+                    ${isMenuOpen
+                            ? "visible translate-y-0 scale-100 opacity-100"
+                            : "invisible translate-y-2 scale-95 opacity-0 pointer-events-none"
+                        }`}
+                    role="menu"
+                    aria-label="User account menu"
+                    aria-hidden={!isMenuOpen}
+                >
+
+                    {/* Menu Header */}
+                    <div className="flex items-center gap-3 rounded-xl
+                    bg-slate-50 p-4">
+
+                        <div className="flex h-12 w-12 shrink-0
+                        items-center justify-center overflow-hidden
+                        rounded-full border-2 border-white
+                        bg-indigo-500 text-lg font-bold text-white shadow">
+
+                            {user.image && !imageFailed ? (
+                                <img
+                                    src={user.image}
+                                    alt={`${fullName}'s profile`}
+                                    className="h-full w-full object-cover"
+                                    onError={() => setImageFailed(true)}
+                                />
+                            ) : (
+                                initials || "U"
+                            )}
                         </div>
 
-                        {/* Mobile */}
-                        <Link
-                            to="/signin"
-                            className="flex h-full flex-col items-center justify-center gap-0.5 text-3xl text-accent
-                   transition-all duration-200 active:scale-90 lg:hidden"
+                        <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-bold text-gray-900">
+                                {fullName}
+                            </p>
+
+                            <p className="truncate text-xs text-gray-500">
+                                {user.email}
+                            </p>
+
+                            {isAdmin && (
+                                <span className="mt-1 inline-flex items-center
+                                gap-1 rounded-full bg-indigo-100 px-2 py-0.5
+                                text-[10px] font-semibold text-indigo-700">
+                                    <FiShield size={11} />
+                                    Administrator
+                                </span>
+                            )}
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={closeMenu}
+                            aria-label="Close menu"
+                            className="rounded-full p-2 text-gray-400
+                            hover:bg-gray-200 hover:text-gray-700
+                            focus-visible:outline-none focus-visible:ring-2
+                            focus-visible:ring-indigo-500 lg:hidden"
                         >
-                            <CiLogin className="transition-transform duration-300 hover:translate-x-0.5" />
-                            <span className="text-xs font-medium text-accent">Login</span>
+                            <FiX size={17} />
+                        </button>
+                    </div>
+
+                    {/* Menu Items */}
+                    <div className="space-y-1 p-1">
+
+                        <Link
+                            to="/settings"
+                            role="menuitem"
+                            tabIndex={isMenuOpen ? 0 : -1}
+                            onClick={closeMenu}
+                            className="flex items-center gap-3 rounded-xl
+                            px-3 py-3 text-sm font-medium text-gray-700
+                            transition-colors hover:bg-indigo-50
+                            hover:text-indigo-700 focus-visible:outline-none
+                            focus-visible:bg-indigo-50 focus-visible:text-indigo-700"
+                        >
+                            <FiSettings size={18} />
+                            Settings
                         </Link>
 
-                    </div>
-
-                ) : (
-
-                    <div className="text-white flex flex-col lg:flex-row justify-center items-center gap-2 lg:gap-4">
-
-                        <img
-                            src={user.image}
-                            className="w-6 h-6 rounded-full inline-block mr-2"
-                        />
-
-                        <select
-                            className="bg-transparent  text-sm text-accent text-center lg:text-white"
-                            value={selectedOption}
-                            onChange={(e) => {
-
-                                const value = e.target.value;
-
-                                setSelectedOption(value);
-
-                                if (value === "settings") {
-
-                                    navigate("/settings");
-                                }
-
-                                if (value === "my-orders") {
-
-                                    navigate("/my-orders");
-                                }
-
-                                if (value === "logout") {
-
-                                    setShowLogoutConfirm(true);
-                                }
-
-                                setSelectedOption("me");
-                            }}
+                        <Link
+                            to="/my-orders"
+                            role="menuitem"
+                            tabIndex={isMenuOpen ? 0 : -1}
+                            onClick={closeMenu}
+                            className="flex items-center gap-3 rounded-xl
+                            px-3 py-3 text-sm font-medium text-gray-700
+                            transition-colors hover:bg-indigo-50
+                            hover:text-indigo-700 focus-visible:outline-none
+                            focus-visible:bg-indigo-50 focus-visible:text-indigo-700"
                         >
+                            <FiPackage size={18} />
+                            My Orders
+                        </Link>
 
-                            <option value="me">
-                                {user.firstName}
-                            </option>
-
-                            <option
-                                className="bg-accent text-white"
-                                value="settings"
+                        {isAdmin && (
+                            <Link
+                                to="/admin"
+                                role="menuitem"
+                                tabIndex={isMenuOpen ? 0 : -1}
+                                onClick={closeMenu}
+                                className="flex items-center gap-3 rounded-xl
+                                px-3 py-3 text-sm font-medium text-gray-700
+                                transition-colors hover:bg-indigo-50
+                                hover:text-indigo-700 focus-visible:outline-none
+                                focus-visible:bg-indigo-50 focus-visible:text-indigo-700"
                             >
-                                Settings
-                            </option>
+                                <FiShield size={18} />
+                                Admin Panel
+                            </Link>
+                        )}
 
-                            <option
-                                className="bg-accent text-white"
-                                value="my-orders"
-                            >
-                                My Orders
-                            </option>
+                        <div className="my-1 border-t border-gray-100" />
 
-                            <option
-                                className="bg-accent text-white"
-                                value="logout"
-                            >
-                                Logout
-                            </option>
-
-                        </select>
-
+                        <button
+                            type="button"
+                            role="menuitem"
+                            tabIndex={isMenuOpen ? 0 : -1}
+                            onClick={() => {
+                                closeMenu();
+                                setShowLogoutConfirm(true);
+                            }}
+                            className="flex w-full items-center gap-3
+                            rounded-xl px-3 py-3 text-sm font-semibold
+                            text-red-600 transition-colors hover:bg-red-50
+                            focus-visible:outline-none focus-visible:bg-red-50"
+                        >
+                            <FiLogOut size={18} />
+                            Logout
+                        </button>
                     </div>
+                </div>
+            </div>
 
-                )
-            }
-
+            {/* Logout Confirmation */}
             {showLogoutConfirm && (
                 <LogoutConfirmModal
                     onCancel={() => setShowLogoutConfirm(false)}
