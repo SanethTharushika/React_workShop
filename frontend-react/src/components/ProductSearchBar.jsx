@@ -5,7 +5,7 @@ export default function ProductSearchBar({ value, onChange, onSearch, onClear, s
 
     const inputRef = useRef(null);
 
-    
+    // Press "/" anywhere on the page to jump to the search bar
     useEffect(() => {
         function onKey(e) {
             const tag = e.target.tagName;
@@ -32,7 +32,7 @@ export default function ProductSearchBar({ value, onChange, onSearch, onClear, s
             className="mx-auto mb-8 w-full max-w-2xl"
         >
             <div
-                className="group flex items-center gap-2 rounded-full border border-gray-200 bg-white pl-5 pr-2 shadow-md
+                className="group flex items-center gap-2 rounded-full border border-gray-200 bg-white pl-5 pr-4 shadow-md
                            transition-all duration-300 hover:shadow-lg
                            focus-within:-translate-y-0.5 focus-within:border-accent focus-within:shadow-xl
                            focus-within:ring-4 focus-within:ring-blue-100"
@@ -54,8 +54,14 @@ export default function ProductSearchBar({ value, onChange, onSearch, onClear, s
                                placeholder:text-gray-400 sm:text-base"
                 />
 
-                {/* Clear button (only when there is text) */}
-                {value && (
+                {/* Right side: spinner while searching, otherwise clear button or shortcut hint */}
+                {searching ? (
+                    <span
+                        role="status"
+                        aria-label="Searching"
+                        className="h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-accent/30 border-t-accent"
+                    />
+                ) : value ? (
                     <button
                         type="button"
                         aria-label="Clear search"
@@ -68,34 +74,14 @@ export default function ProductSearchBar({ value, onChange, onSearch, onClear, s
                     >
                         <FiX />
                     </button>
-                )}
-
-                {/* Shortcut hint (desktop only, hidden while focused or typing) */}
-                {/* {!value && (
+                ) : (
                     <kbd
                         className="hidden rounded-md border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs text-gray-400
                                    transition-opacity duration-200 group-focus-within:opacity-0 sm:block"
                     >
                         /
                     </kbd>
-                )} */}
-
-                {/* Search button with inline spinner */}
-                <button
-                    type="submit"
-                    disabled={searching}
-                    aria-label="Search"
-                    className="flex h-10 min-w-[44px] shrink-0 items-center justify-center gap-2 rounded-full bg-accent px-4
-                               text-sm font-medium text-white transition-all duration-200 hover:brightness-110
-                               active:scale-95 disabled:cursor-not-allowed disabled:opacity-70 sm:px-6"
-                >
-                    {searching ? (
-                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                    ) : (
-                        <FiSearch className="sm:hidden" />
-                    )}
-                    <span className="hidden sm:inline">{searching ? "Searching" : "Search"}</span>
-                </button>
+                )}
             </div>
         </form>
     );
