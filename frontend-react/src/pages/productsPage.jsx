@@ -146,7 +146,7 @@ export default function ProductsPage() {
                 <ProductSearchBar
                     value={query}
                     onChange={setQuery}
-                    onSearch={searchProducts}
+                    onSearch={searchNow}
                     onClear={clearSearch}
                     searching={searching}
                 />
