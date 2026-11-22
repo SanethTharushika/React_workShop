@@ -229,7 +229,7 @@ export default function AdminPage() {
                         <Routes>
                             <Route index element={<AdminOrdersPage />} />
                             <Route path="products" element={<AdminProductPage />} />
-                            <Route path="users" element={<AdminUsersPage />} />
+                            <Route path="users" element={<AdminUsersPage currentUser={user} />} />
                             <Route path="add-product" element={<AdminAddProductForm />} />
                             <Route path="edit-product" element={<AdminEditProductForm />} />
                         </Routes>
