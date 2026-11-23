@@ -1,5 +1,5 @@
 import { Link, NavLink, Routes, Route, useNavigate } from "react-router-dom";
-import { FiShoppingCart, FiLogOut, FiMenu, FiX } from "react-icons/fi";
+import { FiShoppingCart, FiMenu, FiX } from "react-icons/fi";
 import { BsGift } from "react-icons/bs";
 import { FaRegUser } from "react-icons/fa";
 import { useState, useEffect } from "react";
@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import api from "../utils/api.js";
 import LoadingScreen from "../components/loadingScreen.jsx";
 import LogoutConfirmModal from "../components/LogoutConfirmModal.jsx";
+import AdminAccountMenu from "../components/AdminAccountMenu.jsx";
 import AdminProductPage from "./admin/adminProductPage";
 import AdminAddProductForm from "./admin/adminAddProductForm";
 import AdminEditProductForm from "./admin/adminEditProductForm";
@@ -42,10 +43,6 @@ function SidebarLink({ to, icon, label, end = false, onClick }) {
 
 /* Sidebar content, shared by the desktop sidebar and the mobile drawer */
 function SidebarContent({ user, onNavigate, onLogout }) {
-
-    const fullName = user ? [user.firstName, user.lastName].filter(Boolean).join(" ") : "";
-    const initial = user ? (user.firstName || user.email || "A").charAt(0).toUpperCase() : "";
-
     return (
         <div className="flex h-full flex-col">
             <Link to="/admin" onClick={onNavigate} className="block h-[100px] w-full shrink-0 overflow-hidden">
@@ -62,39 +59,9 @@ function SidebarContent({ user, onNavigate, onLogout }) {
                 <SidebarLink to="/admin/users" icon={<FaRegUser />} label="Users" onClick={onNavigate} />
             </div>
 
-            {/* Bottom: logged-in admin + logout */}
+            {/* Bottom: only the account card. Account actions (including Logout) live in its popup */}
             <div className="mt-auto border-t border-gray-100 p-3">
-
-                {user && (
-                    <div className="mb-2 flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2">
-                        {user.image ? (
-                            <img
-                                src={user.image}
-                                alt="Profile"
-                                className="h-9 w-9 shrink-0 rounded-full object-cover"
-                            />
-                        ) : (
-                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-white">
-                                {initial}
-                            </span>
-                        )}
-                        <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-gray-800">{fullName || "Admin"}</p>
-                            <p className="truncate text-xs text-gray-500">{user.email}</p>
-                        </div>
-                    </div>
-                )}
-
-                <button
-                    type="button"
-                    onClick={onLogout}
-                    className="group flex w-full items-center gap-3 rounded-lg border-l-4 border-transparent px-4 py-3 text-xl
-                               text-red-500 transition-all duration-300 hover:translate-x-1 hover:border-red-500
-                               hover:bg-red-50 hover:shadow-md active:scale-95"
-                >
-                    <FiLogOut className="transition-transform duration-300 group-hover:scale-125" />
-                    <span>Logout</span>
-                </button>
+                <AdminAccountMenu user={user} onLogout={onLogout} onNavigate={onNavigate} />
             </div>
         </div>
     );
@@ -102,6 +69,8 @@ function SidebarContent({ user, onNavigate, onLogout }) {
 
 export default function AdminPage() {
     const [user, setUser] = useState(null);
+    const [loadError, setLoadError] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const navigate = useNavigate();
@@ -115,6 +84,8 @@ export default function AdminPage() {
             navigate("/signin", { replace: true });
             return;
         }
+
+        setLoadError(false);
 
         api.get("/users/me", {
             headers: {
@@ -130,18 +101,32 @@ export default function AdminPage() {
                 }
             })
             .catch((error) => {
-                console.error("Failed to load user data:", error);
+                const status = error?.response?.status;
 
-                if (error?.response?.status === 401) {
+                if (status === 401 || status === 403) {
                     localStorage.removeItem("token");
                     toast.error("Session expired. Please sign in again.");
-                } else {
-                    toast.error("Failed to load your account. Please sign in again.");
+                    navigate("/signin", { replace: true });
+                    return;
                 }
 
-                navigate("/signin", { replace: true });
+                console.error("Failed to load user data:", error);
+                setLoadError(true);
             });
-    }, [navigate]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [reloadKey]);
+
+    // Close the mobile drawer with Esc
+    useEffect(() => {
+        if (!menuOpen) return;
+
+        const onKey = (e) => {
+            if (e.key === "Escape") setMenuOpen(false);
+        };
+
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [menuOpen]);
 
     function openLogoutConfirm() {
         setMenuOpen(false);
@@ -150,7 +135,6 @@ export default function AdminPage() {
 
     function confirmLogout() {
         localStorage.removeItem("token");
-        setUser(null);
         setShowLogoutConfirm(false);
         setMenuOpen(false);
         toast.success("Logged out successfully");
@@ -160,7 +144,7 @@ export default function AdminPage() {
     return (
         <div className="fixed inset-0 flex w-full flex-col overflow-hidden bg-primary lg:flex-row">
 
-            {/* Mobile top bar */}
+            {/* Mobile top bar (logout lives in the account popup inside the drawer) */}
             <div className="flex h-14 shrink-0 items-center justify-between bg-white px-3 shadow-md lg:hidden">
                 <button
                     type="button"
@@ -176,15 +160,8 @@ export default function AdminPage() {
                     <img src="/logo.jpg" alt="Logo" className="h-full w-auto rounded-md object-cover" />
                 </Link>
 
-                <button
-                    type="button"
-                    aria-label="Log out"
-                    onClick={openLogoutConfirm}
-                    className="flex h-10 w-10 items-center justify-center rounded-lg text-xl text-red-500
-                               transition active:scale-90"
-                >
-                    <FiLogOut />
-                </button>
+                {/* Spacer keeps the logo centered */}
+                <span className="h-10 w-10" aria-hidden="true" />
             </div>
 
             {/* Desktop sidebar */}
@@ -192,8 +169,12 @@ export default function AdminPage() {
                 <SidebarContent user={user} onNavigate={() => {}} onLogout={openLogoutConfirm} />
             </aside>
 
-            {/* Mobile drawer */}
-            <div className={`fixed inset-0 z-40 lg:hidden ${menuOpen ? "pointer-events-auto" : "pointer-events-none"}`}>
+            {/* Mobile drawer (hidden from the keyboard and screen readers while closed) */}
+            <div
+                aria-hidden={!menuOpen}
+                className={`fixed inset-0 z-40 transition-[visibility] duration-300 lg:hidden
+                            ${menuOpen ? "visible pointer-events-auto" : "invisible pointer-events-none"}`}
+            >
                 <div
                     onClick={() => setMenuOpen(false)}
                     className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300
@@ -222,7 +203,19 @@ export default function AdminPage() {
 
             {/* Content */}
             <div className="flex min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-3 lg:p-4">
-                {user == null ? (
+                {loadError ? (
+                    <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
+                        <p className="text-gray-600">We couldn't load your account.</p>
+                        <button
+                            type="button"
+                            onClick={() => setReloadKey((value) => value + 1)}
+                            className="rounded-lg bg-accent px-5 py-2 text-sm font-medium text-white transition-all
+                                       duration-200 hover:brightness-110 active:scale-95"
+                        >
+                            Try again
+                        </button>
+                    </div>
+                ) : user == null ? (
                     <LoadingScreen />
                 ) : (
                     <div className="min-h-0 min-w-0 flex-1">
