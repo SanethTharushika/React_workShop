@@ -15,7 +15,7 @@ export default function ProductDeleteButton(props) {
     return (
 
         <>
-            <CiTrash className="text-red-600 text-xl hover:text-3xl" onClick={() => setIsModalVisible(true)} />
+            <CiTrash className="text-xl text-red-500 transition-transform duration-200 ease-out hover:scale-125 hover:text-red-700" onClick={() => setIsModalVisible(true)} />
             {
 
                 isModalVisible && (
