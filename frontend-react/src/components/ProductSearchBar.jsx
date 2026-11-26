@@ -75,11 +75,8 @@ export default function ProductSearchBar({ value, onChange, onSearch, onClear, s
                         <FiX />
                     </button>
                 ) : (
-                    <kbd
-                        className="hidden rounded-md border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs text-gray-400
-                                   transition-opacity duration-200 group-focus-within:opacity-0 sm:block"
-                    >
-                        /
+                    <kbd>
+                        
                     </kbd>
                 )}
             </div>
