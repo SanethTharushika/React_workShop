@@ -29,7 +29,7 @@ export default function ProductSearchBar({ value, onChange, onSearch, onClear, s
                 e.preventDefault();
                 onSearch();
             }}
-            className="mx-auto mb-8 w-full max-w-2xl"
+            className="w-full"
         >
             <div
                 className="group flex items-center gap-2 rounded-full border border-gray-200 bg-white pl-5 pr-4 shadow-md
