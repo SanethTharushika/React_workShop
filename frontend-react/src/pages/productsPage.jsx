@@ -1,12 +1,13 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { FiX } from "react-icons/fi";
+import { FiMenu } from "react-icons/fi";
 import api from "../utils/api.js";
-import { getFormattedPrice } from "../utils/price-formatter.jsx";
+import { getPriceBounds, filterByPrice } from "../utils/price-filter.js";
 import LoadingScreen from "../components/loadingScreen.jsx";
 import ProductCard from "../components/productCard.jsx";
 import CategorySidebar from "../components/CategorySidebar.jsx";
 import ProductSearchBar from "../components/ProductSearchBar.jsx";
+import PriceFilterButton from "../components/PriceFilterButton.jsx";
 
 export default function ProductsPage() {
 
@@ -19,8 +20,9 @@ export default function ProductsPage() {
     const [query, setQuery] = useState("");
     const [searching, setSearching] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(categoryFromUrl);
+    const [drawerOpen, setDrawerOpen] = useState(false);
 
-    // null = no price filter, otherwise [min, max]
+    // null = no price filter, otherwise [min, max]. One source of truth for the button, the grid and the empty state
     const [priceRange, setPriceRange] = useState(null);
 
     const timerRef = useRef(null);
@@ -121,24 +123,7 @@ export default function ProductsPage() {
     const categories = [...new Set(allProducts.map((p) => p.category).filter(Boolean))];
 
     // Slider limits come from the full product list, so they don't shrink after a search
-    const priceBounds = useMemo(() => {
-        const prices = allProducts
-            .map((p) => Number(p.price))
-            .filter((n) => Number.isFinite(n) && n >= 0);
-
-        if (prices.length === 0) return { min: 0, max: 0, step: 1 };
-
-        const rawMin = Math.min(...prices);
-        const rawMax = Math.max(...prices);
-        const span = rawMax - rawMin;
-        const step = span >= 100000 ? 1000 : span >= 10000 ? 100 : span >= 1000 ? 10 : 1;
-
-        return {
-            min: Math.floor(rawMin / step) * step,
-            max: Math.ceil(rawMax / step) * step,
-            step,
-        };
-    }, [allProducts]);
+    const priceBounds = useMemo(() => getPriceBounds(allProducts), [allProducts]);
 
     // An unknown category in the URL falls back to "All"
     const activeCategory =
@@ -147,12 +132,7 @@ export default function ProductsPage() {
             : "All";
 
     // 1) search results  ->  2) price range  ->  3) category
-    const priceFiltered = priceRange
-        ? products.filter((p) => {
-            const price = Number(p.price);
-            return price >= priceRange[0] && price <= priceRange[1];
-        })
-        : products;
+    const priceFiltered = filterByPrice(products, priceRange);
 
     const visibleProducts = priceFiltered.filter(
         (p) => activeCategory === "All" || p.category === activeCategory
@@ -183,39 +163,44 @@ export default function ProductsPage() {
                 products={priceFiltered}
                 selected={activeCategory}
                 onSelect={setSelectedCategory}
-                priceBounds={priceBounds}
-                priceRange={priceRange}
-                onPriceChange={setPriceRange}
+                drawerOpen={drawerOpen}
+                onDrawerOpenChange={setDrawerOpen}
             />
 
             {/* Main content */}
             <main className="min-w-0 flex-1 px-4 pb-28 pt-10 lg:px-10 lg:pb-10">
 
-                {/* Search bar */}
-                <ProductSearchBar
-                    value={query}
-                    onChange={setQuery}
-                    onSearch={searchNow}
-                    onClear={clearSearch}
-                    searching={searching}
-                />
+                {/* Toolbar: search + categories (mobile) + price */}
+                <div className="mx-auto mb-8 flex w-full max-w-3xl flex-wrap items-center gap-3">
 
-                {/* Active price filter chip */}
-                {priceRange && (
-                    <div className="mb-6 flex justify-center">
-                        <button
-                            type="button"
-                            onClick={() => setPriceRange(null)}
-                            title="Clear price range"
-                            className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-sm
-                                       font-medium text-accent shadow-md transition-all duration-200
-                                       hover:shadow-lg active:scale-95"
-                        >
-                            Price: {getFormattedPrice(priceRange[0])} – {getFormattedPrice(priceRange[1])}
-                            <FiX />
-                        </button>
+                    <div className="w-full min-w-0 sm:w-auto sm:flex-1">
+                        <ProductSearchBar
+                            value={query}
+                            onChange={setQuery}
+                            onSearch={searchNow}
+                            onClear={clearSearch}
+                            searching={searching}
+                        />
                     </div>
-                )}
+
+                    <button
+                        type="button"
+                        onClick={() => setDrawerOpen(true)}
+                        className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-full border border-gray-200
+                                   bg-white px-4 text-sm font-medium text-gray-700 shadow-md transition-all duration-200
+                                   hover:shadow-lg active:scale-95 sm:h-14 sm:flex-none lg:hidden"
+                    >
+                        <FiMenu className="text-lg" />
+                        Categories
+                    </button>
+
+                    <PriceFilterButton
+                        className="flex-1 sm:flex-none"
+                        bounds={priceBounds}
+                        value={priceRange}
+                        onChange={setPriceRange}
+                    />
+                </div>
 
                 {/* Products */}
                 {!loading && (
